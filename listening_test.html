@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Perception Listening Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .loading-bar {
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
+    <div id="app"></div>
+
+    <script>
+        // CONFIGURATION: Update with your GitHub repository details
+        const CONFIG = {
+            githubUser: 'yttehs',
+            githubRepo: 'Listening_Test',
+            githubBranch: 'main'
+        };
+
+        // State management
+        let state = {
+            stage: 'start',
+            participantId: '',
+            selectedTrial: '',
+            availableTrials: [],
+            audioMapping: [],
+            positions: {},
+            playing: null,
+            dragging: null,
+            hovering: null,
+            loadingProgress: 0,
+            loadingMessage: 'Initializing...',
+            audioContext: null,
+            audioBuffers: {},
+            currentSource: null
+        };
+
+        // Canvas configuration
+        const canvasSize = Math.min(window.innerWidth - 100, 800);
+
+        // Initialize - Load available trials
+        async function initialize() {
+            try {
+                const trialsUrl = `https://raw.githubusercontent.com/${CONFIG.githubUser}/${CONFIG.githubRepo}/${CONFIG.githubBranch}/trials_list.json`;
+                const response = await fetch(trialsUrl);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    state.availableTrials = data.trials;
+                } else {
+                    // Fallback: generate trial list if trials_list.json doesn't exist
+                    state.availableTrials = generateDefaultTrials();
+                }
+            } catch (error) {
+                console.error('Error loading trials list:', error);
+                state.availableTrials = generateDefaultTrials();
+            }
+            render();
+        }
+
+        function generateDefaultTrials() {
+            const trials = [];
+            const genders = ["Male", "Female"];
+            const styles = ["read", "conv"];
+            const mgCombos = ["MG1_MG2", "MG1_MG3", "MG1_MG4", "MG2_MG3", "MG2_MG4", "MG3_MG4"];
+            
+            for (let gender of genders) {
+                for (let style of styles) {
+                    for (let mg of mgCombos) {
+                        const trialId = `${gender}_${style}_${mg}`;
+                        trials.push({
+                            id: trialId,
+                            name: trialId.replace(/_/g, " "),
+                            numFiles: 24
+                        });
+                    }
+                }
+            }
+            return trials;
+        }
+
+        // Render functions
+        function render() {
+            const app = document.getElementById('app');
+            
+            switch(state.stage) {
+                case 'start':
+                    app.innerHTML = renderStart();
+                    break;
+                case 'loading':
+                    app.innerHTML = renderLoading();
+                    break;
+                case 'instructions':
+                    app.innerHTML = renderInstructions();
+                    break;
+                case 'test':
+                    app.innerHTML = renderTest();
+                    setTimeout(drawCanvas, 0);
+                    break;
+                case 'complete':
+                    app.innerHTML = renderComplete();
+                    break;
+            }
+        }
+
+        function renderStart() {
+            const trialsOptions = state.availableTrials.map(trial => 
+                `<option value="${trial.id}">${trial.name} (${trial.numFiles} samples)</option>`
+            ).join('');
+
+            return `
+                <div class="p-8">
+                    <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-6">Voice Perception Listening Test</h1>
+                        
+                        <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <div class="text-sm text-gray-700">
+                                    <p class="font-semibold mb-2">Welcome!</p>
+                                    <p class="mb-2">
+                                        In this test, you will listen to voice samples and arrange them in a 2D space based on how similar they sound to you.
+                                    </p>
+                                    <p>The test will take approximately 15-20 minutes to complete.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Participant ID</label>
+                            <input
+                                type="text"
+                                id="participantId"
+                                value="${state.participantId}"
+                                placeholder="Enter your unique participant ID"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            />
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Select Trial</label>
+                            <select
+                                id="trialSelect"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            >
+                                <option value="">-- Select a trial --</option>
+                                ${trialsOptions}
+                            </select>
+                            <p class="text-xs text-gray-500 mt-2">Please select the trial assigned to you by the researcher.</p>
+                        </div>
+
+                        <button
+                            onclick="startLoading()"
+                            id="loadButton"
+                            class="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+                        >
+                            Load Audio Files & Continue
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderLoading() {
+            return `
+                <div class="p-8 flex items-center justify-center min-h-screen">
+                    <div class="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8 text-center">
+                        <svg class="w-16 h-16 text-indigo-600 mx-auto mb-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>
+                        </svg>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4">${state.loadingMessage}</h2>
+                        <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
+                            <div class="loading-bar bg-indigo-600 h-4 rounded-full" style="width: ${state.loadingProgress}%"></div>
+                        </div>
+                        <p class="text-gray-600">${state.loadingProgress}% complete</p>
+                        <p class="text-sm text-gray-500 mt-4">Please wait while we load the voice samples...</p>
+                        <p class="text-sm font-medium text-indigo-600 mt-2">Trial: ${state.selectedTrial.replace(/_/g, " ")}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderInstructions() {
+            const numSamples = state.audioMapping.length;
+            
+            return `
+                <div class="p-8">
+                    <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-8">
+                        <div class="mb-4 p-3 bg-indigo-100 rounded-lg">
+                            <p class="text-sm font-medium text-indigo-800">
+                                Trial: ${state.selectedTrial.replace(/_/g, " ")} | Participant: ${state.participantId}
+                            </p>
+                        </div>
+
+                        <h1 class="text-3xl font-bold text-gray-800 mb-6">Test Instructions</h1>
+                        
+                        <div class="space-y-4 text-gray-700 mb-8">
+                            <div class="p-4 bg-indigo-50 rounded-lg">
+                                <h2 class="font-semibold text-lg mb-2">Your Task:</h2>
+                                <p>You will arrange ${numSamples} voice samples (numbered 1-${numSamples}) in a 2D space based on how similar they sound to you.</p>
+                            </div>
+
+                            <div class="p-4 bg-gray-50 rounded-lg">
+                                <h3 class="font-semibold mb-2">How to arrange voices:</h3>
+                                <ul class="list-disc list-inside space-y-2">
+                                    <li><strong>Similar-sounding voices</strong> → Place them close together</li>
+                                    <li><strong>Different-sounding voices</strong> → Place them far apart</li>
+                                    <li>Use the entire 2D space to maximize differentiation</li>
+                                </ul>
+                            </div>
+
+                            <div class="p-4 bg-gray-50 rounded-lg">
+                                <h3 class="font-semibold mb-2">Controls:</h3>
+                                <ul class="list-disc list-inside space-y-2">
+                                    <li><strong>Click</strong> a numbered circle to play that voice sample</li>
+                                    <li><strong>Drag</strong> circles to reposition them in the space</li>
+                                    <li>The circle turns <span class="text-green-600 font-semibold">green</span> when playing audio</li>
+                                    <li>Listen to samples as many times as you need</li>
+                                    <li>Take your time - there are no wrong answers</li>
+                                </ul>
+                            </div>
+
+                            <div class="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                                <p class="text-sm">
+                                    <strong>Important:</strong> Your perception is subjective and valuable. 
+                                    Arrange the voices based on what sounds similar or different to YOU personally.
+                                </p>
+                            </div>
+                        </div>
+
+                        <button
+                            onclick="startTest()"
+                            class="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium text-lg"
+                        >
+                            Start Test
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTest() {
+            return `
+                <div class="p-8">
+                    <div class="max-w-6xl mx-auto">
+                        <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <div>
+                                    <h1 class="text-2xl font-bold text-gray-800">Voice Arrangement Task</h1>
+                                    <p class="text-gray-600">Participant: ${state.participantId} | Trial: ${state.selectedTrial.replace(/_/g, " ")}</p>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button
+                                        onclick="resetPositions()"
+                                        class="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                        </svg>
+                                        Reset
+                                    </button>
+                                    <button
+                                        onclick="completeTest()"
+                                        class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+                                    >
+                                        Complete Test
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <div class="mb-4 p-3 bg-blue-50 rounded-lg">
+                                <p class="text-sm text-gray-700">
+                                    <strong>Click</strong> circles to play audio • <strong>Drag</strong> circles to arrange • 
+                                    <span class="ml-2 inline-flex items-center gap-1">
+                                        <span class="w-3 h-3 bg-green-500 rounded-full"></span> = Playing
+                                    </span>
+                                </p>
+                            </div>
+                            
+                            <canvas
+                                id="canvas"
+                                width="${canvasSize}"
+                                height="${canvasSize}"
+                                class="cursor-pointer border border-gray-300 rounded-lg mx-auto block"
+                            ></canvas>
+                            <p class="text-sm text-gray-500 mt-4 text-center">
+                                Similar voices should be close together. Different voices should be far apart.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderComplete() {
+            return `
+                <div class="p-8">
+                    <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8">
+                        <div class="text-center mb-8">
+                            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <h1 class="text-3xl font-bold text-gray-800 mb-2">Test Complete!</h1>
+                            <p class="text-gray-600">Thank you for participating, ${state.participantId}</p>
+                            <p class="text-sm text-gray-500 mt-2">Trial: ${state.selectedTrial.replace(/_/g, " ")}</p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="p-4 bg-gray-50 rounded-lg">
+                                <h2 class="font-semibold mb-2">Results Summary:</h2>
+                                <ul class="text-sm text-gray-700 space-y-1">
+                                    <li>• Voice samples arranged: ${state.audioMapping.length}</li>
+                                    <li>• Unique pairwise distances: ${(state.audioMapping.length * (state.audioMapping.length - 1)) / 2}</li>
+                                    <li>• Coordinates normalized to 0-1 scale</li>
+                                </ul>
+                            </div>
+
+                            <div class="space-y-3">
+                                <button
+                                    onclick="exportResults()"
+                                    class="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+                                >
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                    Download Results (JSON)
+                                </button>
+                                
+                                <button
+                                    onclick="exportCSV()"
+                                    class="w-full flex items-center justify-center gap-2 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-medium"
+                                >
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                    Download Distance Matrix (CSV)
+                                </button>
+                            </div>
+
+                            <div class="pt-4 border-t border-gray-200">
+                                <p class="text-sm text-gray-600 text-center mb-4">
+                                    Please send your downloaded results file to the researcher.
+                                </p>
+                                <button
+                                    onclick="window.location.reload()"
+                                    class="w-full text-indigo-600 hover:text-indigo-800 transition-colors py-2"
+                                >
+                                    Start Another Trial
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Core functions
+        async function startLoading() {
+            const participantInput = document.getElementById('participantId');
+            const trialSelect = document.getElementById('trialSelect');
+            
+            state.participantId = participantInput.value.trim();
+            state.selectedTrial = trialSelect.value;
+            
+            if (!state.participantId) {
+                alert('Please enter a participant ID');
+                return;
+            }
+
+            if (!state.selectedTrial) {
+                alert('Please select a trial');
+                return;
+            }
+
+            state.stage = 'loading';
+            render();
+
+            try {
+                await loadConfiguration();
+                await loadAudioFiles();
+                initializePositions();
+                state.stage = 'instructions';
+                render();
+            } catch (error) {
+                console.error('Error during loading:', error);
+                alert('Error loading audio files. Please check your internet connection and try again.\n\nError: ' + error.message);
+                state.stage = 'start';
+                render();
+            }
+        }
+
+        async function loadConfiguration() {
+            state.loadingMessage = 'Loading configuration...';
+            render();
+
+            const configUrl = `https://raw.githubusercontent.com/${CONFIG.githubUser}/${CONFIG.githubRepo}/${CONFIG.githubBranch}/${state.selectedTrial}/config.json`;
+            
+            const response = await fetch(configUrl);
+            if (!response.ok) {
+                throw new Error(`Configuration file not found for trial: ${state.selectedTrial}`);
+            }
+            
+            const config = await response.json();
+            state.audioMapping = config.audioFiles;
+        }
+
+        async function loadAudioFiles() {
+            state.loadingMessage = 'Loading audio files...';
+            
+            if (!state.audioContext) {
+                state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            for (let idx = 0; idx < state.audioMapping.length; idx++) {
+                const audioUrl = state.audioMapping[idx].url;
+                const response = await fetch(audioUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to load ${state.audioMapping[idx].filename}`);
+                }
+                
+                const arrayBuffer = await response.arrayBuffer();
+                const audioBuffer = await state.audioContext.decodeAudioData(arrayBuffer);
+                state.audioBuffers[idx] = audioBuffer;
+                
+                state.loadingProgress = Math.round(((idx + 1) / state.audioMapping.length) * 100);
+                render();
+            }
+        }
+
+        function initializePositions() {
+            state.positions = {};
+            for (let i = 0; i < state.audioMapping.length; i++) {
+                state.positions[i] = {
+                    x: 0.1 + Math.random() * 0.8,
+                    y: 0.1 + Math.random() * 0.8
+                };
+            }
+        }
+
+        function startTest() {
+            state.stage = 'test';
+            render();
+            setupCanvas();
+        }
+
+        function setupCanvas() {
+            const canvas = document.getElementById('canvas');
+            if (!canvas) return;
+
+            canvas.addEventListener('mousedown', handleMouseDown);
+            canvas.addEventListener('mousemove', handleMouseMove);
+            canvas.addEventListener('mouseup', handleMouseUp);
+            canvas.addEventListener('mouseleave', handleMouseUp);
+        }
+
+        function handleMouseDown(e) {
+            const canvas = document.getElementById('canvas');
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width;
+            const y = (e.clientY - rect.top) / rect.height;
+            
+            for (let i = 0; i < state.audioMapping.length; i++) {
+                const pos = state.positions[i];
+                const dist = Math.sqrt(Math.pow(x - pos.x, 2) + Math.pow(y - pos.y, 2));
+                if (dist < 0.025) {
+                    setTimeout(() => {
+                        if (state.dragging === null) {
+                            togglePlay(i);
+                        }
+                    }, 100);
+                    state.dragging = i;
+                    return;
+                }
+            }
+        }
+
+        function handleMouseMove(e) {
+            const canvas = document.getElementById('canvas');
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width;
+            const y = (e.clientY - rect.top) / rect.height;
+
+            if (state.dragging !== null) {
+                const clampedX = Math.max(0, Math.min(1, x));
+                const clampedY = Math.max(0, Math.min(1, y));
+                state.positions[state.dragging] = { x: clampedX, y: clampedY };
+                drawCanvas();
+            } else {
+                let hoverFound = null;
+                for (let i = 0; i < state.audioMapping.length; i++) {
+                    const pos = state.positions[i];
+                    const dist = Math.sqrt(Math.pow(x - pos.x, 2) + Math.pow(y - pos.y, 2));
+                    if (dist < 0.025) {
+                        hoverFound = i;
+                        break;
+                    }
+                }
+                if (state.hovering !== hoverFound) {
+                    state.hovering = hoverFound;
+                    drawCanvas();
+                }
+            }
+        }
+
+        function handleMouseUp() {
+            state.dragging = null;
+        }
+
+        function togglePlay(id) {
+            if (state.currentSource) {
+                state.currentSource.stop();
+                state.currentSource = null;
+            }
+
+            if (state.playing === id) {
+                state.playing = null;
+                drawCanvas();
+                return;
+            }
+
+            const audioBuffer = state.audioBuffers[id];
+            if (!audioBuffer) return;
+
+            const source = state.audioContext.createBufferSource();
+            source.buffer = audioBuffer;
+            source.connect(state.audioContext.destination);
+            
+            source.onended = () => {
+                state.playing = null;
+                state.currentSource = null;
+                drawCanvas();
+            };
+
+            source.start(0);
+            state.currentSource = source;
+            state.playing = id;
+            drawCanvas();
+        }
+
+        function drawCanvas() {
+            const canvas = document.getElementById('canvas');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw grid
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 10; i++) {
+                const pos = (i / 10) * canvas.width;
+                ctx.beginPath();
+                ctx.moveTo(pos, 0);
+                ctx.lineTo(pos, canvas.height);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(0, pos);
+                ctx.lineTo(canvas.width, pos);
+                ctx.stroke();
+            }
+            
+            // Draw border
+            ctx.strokeStyle = '#9ca3af';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw circles
+            for (let i = 0; i < state.audioMapping.length; i++) {
+                const pos = state.positions[i];
+                const x = pos.x * canvas.width;
+                const y = pos.y * canvas.height;
+                
+                let fillColor = '#6366f1';
+                if (state.playing === i) {
+                    fillColor = '#10b981';
+                } else if (state.dragging === i) {
+                    fillColor = '#3b82f6';
+                } else if (state.hovering === i) {
+                    fillColor = '#818cf8';
+                }
+                
+                ctx.fillStyle = fillColor;
+                ctx.beginPath();
+                ctx.arc(x, y, 25, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 16px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(i + 1, x, y);
+            }
+        }
+
+        function resetPositions() {
+            initializePositions();
+            drawCanvas();
+        }
+
+        function completeTest() {
+            if (state.currentSource) {
+                state.currentSource.stop();
+                state.currentSource = null;
+            }
+            state.stage = 'complete';
+            render();
+        }
+
+        function calculateDistances() {
+            const distances = [];
+            for (let i = 0; i < state.audioMapping.length; i++) {
+                for (let j = i + 1; j < state.audioMapping.length; j++) {
+                    const pos1 = state.positions[i];
+                    const pos2 = state.positions[j];
+                    const dist = Math.sqrt(
+                        Math.pow(pos2.x - pos1.x, 2) + Math.pow(pos2.y - pos1.y, 2)
+                    );
+                    distances.push({
+                        voice1: i + 1,
+                        voice2: j + 1,
+                        distance: dist.toFixed(6)
+                    });
+                }
+            }
+            return distances;
+        }
+
+        function exportResults() {
+            const results = {
+                participantId: state.participantId,
+                trialId: state.selectedTrial,
+                timestamp: new Date().toISOString(),
+                positions: state.audioMapping.map((audio, i) => ({
+                    circle: i + 1,
+                    filename: audio.filename,
+                    x: state.positions[i].x.toFixed(6),
+                    y: state.positions[i].y.toFixed(6)
+                })),
+                distances: calculateDistances()
+            };
+            
+            const blob = new Blob([JSON.stringify(results, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `voice_perception_${state.participantId}_${state.selectedTrial}_${Date.now()}.json`;
+            a.click();
+        }
+
+        function exportCSV() {
+            const distances = calculateDistances();
+            const csv = [
+                'Participant ID,Trial ID,Voice 1,Voice 2,Distance',
+                ...distances.map(d => `${state.participantId},${state.selectedTrial},${d.voice1},${d.voice2},${d.distance}`)
+            ].join('\n');
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `voice_perception_${state.participantId}_${state.selectedTrial}_${Date.now()}.csv`;
+            a.click();
+        }
+
+        // Initialize on page load
+        initialize();
+    </script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+{
+  "trialId": "Female_read_MG1_MG3",
+  "audioFiles": [
+    {
+      "circle": 1,
+      "filename": "100_C_the_boy_was_there_seg000.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/100_C_the_boy_was_there_seg000.wav"
+    },
+    {
+      "circle": 2,
+      "filename": "109_A_helps_pass_the_evening_seg001.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/109_A_helps_pass_the_evening_seg001.wav"
+    },
+    {
+      "circle": 3,
+      "filename": "113_A_broke_the_mans_fall_seg001.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/113_A_broke_the_mans_fall_seg001.wav"
+    },
+    {
+      "circle": 4,
+      "filename": "115_C_there_when_the_sun_seg001.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/115_C_there_when_the_sun_seg001.wav"
+    },
+    {
+      "circle": 5,
+      "filename": "11_A_help_the_woman_get_seg000.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/11_A_help_the_woman_get_seg000.wav"
+    },
+    {
+      "circle": 6,
+      "filename": "12_C_kick_the_ball_straight_and_seg000.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/12_C_kick_the_ball_straight_and_seg000.wav"
+    },
+    {
+      "circle": 7,
+      "filename": "16_B_helps_to_pass_the_seg001.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/16_B_helps_to_pass_the_seg001.wav"
+    },
+    {
+      "circle": 8,
+      "filename": "22_A_the_soft_cushion_broke_the_mans_seg000.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/22_A_the_soft_cushion_broke_the_mans_seg000.wav"
+    },
+    {
+      "circle": 9,
+      "filename": "25_A_kick_the_ball_straight_and_seg000.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/25_A_kick_the_ball_straight_and_seg000.wav"
+    },
+    {
+      "circle": 10,
+      "filename": "34_A_get_back_to_her_seg001.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/34_A_get_back_to_her_seg001.wav"
+    },
+    {
+      "circle": 11,
+      "filename": "37_A_a_pot_of_tea_helps_seg000.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/37_A_a_pot_of_tea_helps_seg000.wav"
+    },
+    {
+      "circle": 12,
+      "filename": "3_B_the_soft_cushion_broke_seg000.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/3_B_the_soft_cushion_broke_seg000.wav"
+    },
+    {
+      "circle": 13,
+      "filename": "44_B_kick_the_ball_straight_seg000.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/44_B_kick_the_ball_straight_seg000.wav"
+    },
+    {
+      "circle": 14,
+      "filename": "46_C_to_pass_the_evening_seg002.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/46_C_to_pass_the_evening_seg002.wav"
+    },
+    {
+      "circle": 15,
+      "filename": "47_B_straight_and_follow_seg001.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/47_B_straight_and_follow_seg001.wav"
+    },
+    {
+      "circle": 16,
+      "filename": "48_B_soft_cushion_broke_the_mans_seg000.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/48_B_soft_cushion_broke_the_mans_seg000.wav"
+    },
+    {
+      "circle": 17,
+      "filename": "56_A_the_soft_cushion_seg000.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/56_A_the_soft_cushion_seg000.wav"
+    },
+    {
+      "circle": 18,
+      "filename": "59_A_when_the_sun_rose_seg001.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/59_A_when_the_sun_rose_seg001.wav"
+    },
+    {
+      "circle": 19,
+      "filename": "5_A_the_boy_was_there_when_the_seg000.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/5_A_the_boy_was_there_when_the_seg000.wav"
+    },
+    {
+      "circle": 20,
+      "filename": "64_C_the_boy_was_there_when_the_sun_seg000.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/64_C_the_boy_was_there_when_the_sun_seg000.wav"
+    },
+    {
+      "circle": 21,
+      "filename": "68_C_get_back_to_her_feet_seg001.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/68_C_get_back_to_her_feet_seg001.wav"
+    },
+    {
+      "circle": 22,
+      "filename": "6_A_the_boy_was_there_when_seg000.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/6_A_the_boy_was_there_when_seg000.wav"
+    },
+    {
+      "circle": 23,
+      "filename": "77_A_cushion_broke_the_mans_seg001.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/77_A_cushion_broke_the_mans_seg001.wav"
+    },
+    {
+      "circle": 24,
+      "filename": "7_B_and_follow_through_seg001.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/7_B_and_follow_through_seg001.wav"
+    },
+    {
+      "circle": 25,
+      "filename": "92_C_the_soft_cushion_broke_the_seg000.wav",
+      "url": "https://raw.githubusercontent.com/yttehs/Listening_Test/main/Female_read_MG1_MG3/92_C_the_soft_cushion_broke_the_seg000.wav"
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "trials": [
+    {
+      "id": "Male_read_MG1_MG2",
+      "name": "Male read MG1 MG2",
+      "numFiles": 24
+    },
+    {
+      "id": "Male_read_MG1_MG3",
+      "name": "Male read MG1 MG3",
+      "numFiles": 25
+    },
+    {
+      "id": "Male_read_MG1_MG4",
+      "name": "Male read MG1 MG4",
+      "numFiles": 25
+    },
+    {
+      "id": "Male_read_MG2_MG3",
+      "name": "Male read MG2 MG3",
+      "numFiles": 25
+    },
+    {
+      "id": "Male_read_MG2_MG4",
+      "name": "Male read MG2 MG4",
+      "numFiles": 25
+    },
+    {
+      "id": "Male_read_MG3_MG4",
+      "name": "Male read MG3 MG4",
+      "numFiles": 26
+    },
+    {
+      "id": "Male_conv_MG1_MG2",
+      "name": "Male conv MG1 MG2",
+      "numFiles": 24
+    },
+    {
+      "id": "Male_conv_MG1_MG3",
+      "name": "Male conv MG1 MG3",
+      "numFiles": 25
+    },
+    {
+      "id": "Male_conv_MG1_MG4",
+      "name": "Male conv MG1 MG4",
+      "numFiles": 25
+    },
+    {
+      "id": "Male_conv_MG2_MG3",
+      "name": "Male conv MG2 MG3",
+      "numFiles": 25
+    },
+    {
+      "id": "Male_conv_MG2_MG4",
+      "name": "Male conv MG2 MG4",
+      "numFiles": 25
+    },
+    {
+      "id": "Male_conv_MG3_MG4",
+      "name": "Male conv MG3 MG4",
+      "numFiles": 26
+    },
+    {
+      "id": "Female_read_MG1_MG2",
+      "name": "Female read MG1 MG2",
+      "numFiles": 24
+    },
+    {
+      "id": "Female_read_MG1_MG3",
+      "name": "Female read MG1 MG3",
+      "numFiles": 25
+    },
+    {
+      "id": "Female_read_MG1_MG4",
+      "name": "Female read MG1 MG4",
+      "numFiles": 25
+    },
+    {
+      "id": "Female_read_MG2_MG3",
+      "name": "Female read MG2 MG3",
+      "numFiles": 25
+    },
+    {
+      "id": "Female_read_MG2_MG4",
+      "name": "Female read MG2 MG4",
+      "numFiles": 25
+    },
+    {
+      "id": "Female_read_MG3_MG4",
+      "name": "Female read MG3 MG4",
+      "numFiles": 26
+    },
+    {
+      "id": "Female_conv_MG1_MG2",
+      "name": "Female conv MG1 MG2",
+      "numFiles": 24
+    },
+    {
+      "id": "Female_conv_MG1_MG3",
+      "name": "Female conv MG1 MG3",
+      "numFiles": 24
+    },
+    {
+      "id": "Female_conv_MG1_MG4",
+      "name": "Female conv MG1 MG4",
+      "numFiles": 24
+    },
+    {
+      "id": "Female_conv_MG2_MG3",
+      "name": "Female conv MG2 MG3",
+      "numFiles": 24
+    },
+    {
+      "id": "Female_conv_MG2_MG4",
+      "name": "Female conv MG2 MG4",
+      "numFiles": 24
+    },
+    {
+      "id": "Female_conv_MG3_MG4",
+      "name": "Female conv MG3 MG4",
+      "numFiles": 24
+    }
+  ]
+}
