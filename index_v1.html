@@ -1,128 +1,4 @@
-function renderComplete() {
-            return `
-                <div class="p-8">
-                    <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8">
-                        <div class="text-center mb-8">
-                            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                </svg>
-                            </div>
-                            <h1 class="text-3xl font-bold text-gray-800 mb-2">Test Complete!</h1>
-                            <p class="text-gray-600">Thank you for participating, ${state.participantId}</p>
-                            <p class="text-sm text-gray-500 mt-2">Trial: ${state.selectedTrial.replace(/_/g, " ")}</p>
-                        </div>
-
-                        <div class="space-y-4">
-                            <div class="p-4 bg-gray-50 rounded-lg">
-                                <h2 class="font-semibold mb-2">Results Summary:</h2>
-                                <ul class="text-sm text-gray-700 space-y-1">
-                                    <li>• Voice samples arranged: ${state.audioMapping.length}</li>
-                                    <li>• Unique pairwise distances: ${(state.audioMapping.length * (state.audioMapping.length - 1)) / 2}</li>
-                                    <li>• Coordinates normalized to 0-1 scale</li>
-                                </ul>
-                            </div>
-
-                            <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                                <h3 class="font-semibold text-blue-900 mb-3">Submit Your Results</h3>
-                                <p class="text-sm text-gray-700 mb-4">
-                                    Click the button below to automatically send your results to the researcher via email.
-                                </p>
-                                <button
-                                    onclick="submitResults()"
-                                    id="submitButton"
-                                    class="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                                >
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                                    </svg>
-                                    Email Results to Researcher
-                                </button>
-                                <p id="submitStatus" class="text-sm mt-2 text-center"></p>
-                            </div>
-
-                            <div class="p-4 bg-gray-50 rounded-lg border border-gray-300">
-                                <h3 class="font-semibold text-gray-800 mb-2">Or Download Results Manually</h3>
-                                <p class="text-xs text-gray-600 mb-3">If email submission doesn't work, you can download and send the files manually.</p>
-                                <div class="space-y-2">
-                                    <button
-                                        onclick="exportResults()"
-                                        class="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm"
-                                    >
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                                        </svg>
-                                        Download JSON
-                                    </button>
-                                    
-                                    <button
-                                        onclick="exportCSV()"
-                                        class="w-full flex items-center justify-center gap-2 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors text-sm"
-                                    >
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                                        </svg>
-                                        Download CSV
-                                    </button>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-2">
-                                    Then email the files to: <strong>shettyvishwas@ucla.edu</strong>
-                                </p>
-                            </div>
-
-                            <div class="pt-4 border-t border-gray-200">
-                                <button
-                                    onclick="window.location.reload()"
-                                    class="w-full text-indigo-600 hover:text-indigo-800 transition-colors py-2"
-                                >
-                                    Start Another Trial
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function submitResults() {
-            const button = document.getElementById('submitButton');
-            const status = document.getElementById('submitStatus');
-            
-            button.disabled = true;
-            button.innerHTML = '<span class="animate-pulse">Sending...</span>';
-            status.textContent = '';
-
-            const results = {
-                participantId: state.participantId,
-                trialId: state.selectedTrial,
-                timestamp: new Date().toISOString(),
-                demographics: state.demographics,
-                positions: state.audioMapping.map((audio, i) => ({
-                    circle: i + 1,
-                    filename: audio.filename,
-                    x: state.positions[i].x.toFixed(6),
-                    y: state.positions[i].y.toFixed(6)
-                })),
-                distances: calculateDistances()
-            };
-
-            const jsonData = JSON.stringify(results, null, 2);
-            const csvData = generateCSVData();
-
-            // Create mailto link with results
-            const subject = encodeURIComponent(`Voice Perception Test Results - ${state.participantId} - ${state.selectedTrial}`);
-            const body = encodeURIComponent(
-                `Results for Participant: ${state.participantId}\n` +
-                `Trial: ${state.selectedTrial}\n` +
-                `Completed: ${new Date().toLocaleString()}\n\n` +
-                `Demographics:\n` +
-                `- Listening Device: ${state.demographics.listeningDevice}\n` +
-                `- Music Background: ${state.demographics.musicBackground}\n` +
-                `- Language Background: ${state.demographics.languageBackground}\n` +
-                `- First Language: ${state.demographics.firstLanguage || 'N/A'}\n` +
-                `- Languages Spoken: ${state.demographics.otherLanguages}\n` +
-                `- Age: ${state.demographics.age}\n\n` +
-                `Please download the attached JSON file for complete results data.`<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -152,14 +28,6 @@ function renderComplete() {
             participantId: '',
             selectedTrial: '',
             availableTrials: [],
-            demographics: {
-                listeningDevice: '',
-                musicBackground: '',
-                languageBackground: '',
-                firstLanguage: '',
-                otherLanguages: '',
-                age: ''
-            },
             audioMapping: [],
             positions: {},
             playing: null,
@@ -266,7 +134,7 @@ function renderComplete() {
                         </div>
 
                         <div class="mb-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Participant ID *</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Participant ID</label>
                             <input
                                 type="text"
                                 id="participantId"
@@ -277,7 +145,7 @@ function renderComplete() {
                         </div>
 
                         <div class="mb-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Select Trial *</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Select Trial</label>
                             <select
                                 id="trialSelect"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
@@ -288,84 +156,8 @@ function renderComplete() {
                             <p class="text-xs text-gray-500 mt-2">Please select the trial assigned to you by the researcher.</p>
                         </div>
 
-                        <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-300">
-                            <h3 class="font-semibold text-gray-800 mb-4">Background Information</h3>
-                            
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Listening Device *</label>
-                                    <select
-                                        id="listeningDevice"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                    >
-                                        <option value="">-- Select --</option>
-                                        <option value="headphones">Headphones</option>
-                                        <option value="earphones">Earphones</option>
-                                        <option value="speakers">Speakers</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Do you have a background in music? *</label>
-                                    <select
-                                        id="musicBackground"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                    >
-                                        <option value="">-- Select --</option>
-                                        <option value="yes">Yes</option>
-                                        <option value="no">No</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Language Background *</label>
-                                    <select
-                                        id="languageBackground"
-                                        onchange="toggleFirstLanguage()"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                    >
-                                        <option value="">-- Select --</option>
-                                        <option value="native">Native English Speaker</option>
-                                        <option value="non-native">Non-Native English Speaker</option>
-                                    </select>
-                                </div>
-
-                                <div id="firstLanguageDiv" style="display: none;">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">What is your first language? *</label>
-                                    <input
-                                        type="text"
-                                        id="firstLanguage"
-                                        placeholder="e.g., Spanish, Mandarin, Hindi"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">What languages do you speak? *</label>
-                                    <input
-                                        type="text"
-                                        id="otherLanguages"
-                                        placeholder="e.g., English, Spanish, French"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Age *</label>
-                                    <input
-                                        type="number"
-                                        id="age"
-                                        placeholder="Enter your age"
-                                        min="18"
-                                        max="100"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
                         <button
-                            onclick="validateAndStart()"
+                            onclick="startLoading()"
                             id="loadButton"
                             class="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
                         >
@@ -374,68 +166,6 @@ function renderComplete() {
                     </div>
                 </div>
             `;
-        }
-
-        function toggleFirstLanguage() {
-            const langBg = document.getElementById('languageBackground').value;
-            const firstLangDiv = document.getElementById('firstLanguageDiv');
-            firstLangDiv.style.display = langBg === 'non-native' ? 'block' : 'none';
-        }
-
-        function validateAndStart() {
-            // Get all values
-            state.participantId = document.getElementById('participantId').value.trim();
-            state.selectedTrial = document.getElementById('trialSelect').value;
-            state.demographics.listeningDevice = document.getElementById('listeningDevice').value;
-            state.demographics.musicBackground = document.getElementById('musicBackground').value;
-            state.demographics.languageBackground = document.getElementById('languageBackground').value;
-            state.demographics.firstLanguage = document.getElementById('firstLanguage').value.trim();
-            state.demographics.otherLanguages = document.getElementById('otherLanguages').value.trim();
-            state.demographics.age = document.getElementById('age').value;
-
-            // Validate required fields
-            if (!state.participantId) {
-                alert('Please enter a participant ID');
-                return;
-            }
-
-            if (!state.selectedTrial) {
-                alert('Please select a trial');
-                return;
-            }
-
-            if (!state.demographics.listeningDevice) {
-                alert('Please select your listening device');
-                return;
-            }
-
-            if (!state.demographics.musicBackground) {
-                alert('Please indicate if you have a music background');
-                return;
-            }
-
-            if (!state.demographics.languageBackground) {
-                alert('Please select your language background');
-                return;
-            }
-
-            if (state.demographics.languageBackground === 'non-native' && !state.demographics.firstLanguage) {
-                alert('Please enter your first language');
-                return;
-            }
-
-            if (!state.demographics.otherLanguages) {
-                alert('Please list the languages you speak');
-                return;
-            }
-
-            if (!state.demographics.age || state.demographics.age < 18) {
-                alert('Please enter a valid age (18 or older)');
-                return;
-            }
-
-            // All validated, proceed
-            startLoading();
         }
 
         function renderLoading() {
@@ -472,28 +202,6 @@ function renderComplete() {
                         <h1 class="text-3xl font-bold text-gray-800 mb-6">Test Instructions</h1>
                         
                         <div class="space-y-4 text-gray-700 mb-8">
-                            <div class="p-4 bg-red-50 rounded-lg border-2 border-red-300">
-                                <h3 class="font-semibold text-red-900 mb-2">⚠️ Important Listening Environment</h3>
-                                <ul class="list-disc list-inside space-y-1 text-sm">
-                                    <li><strong>Take this test in a quiet room</strong> with minimal background noise</li>
-                                    <li>Ensure your ${state.demographics.listeningDevice} are properly connected and working</li>
-                                    <li>Adjust your volume to a comfortable level before starting</li>
-                                </ul>
-                            </div>
-
-                            <div class="p-4 bg-yellow-50 rounded-lg border-2 border-yellow-300">
-                                <h3 class="font-semibold text-yellow-900 mb-2">🎯 What to Focus On</h3>
-                                <p class="text-sm mb-2">
-                                    <strong>Your task is to judge how the voices SOUND, not what they are saying.</strong>
-                                </p>
-                                <ul class="list-disc list-inside space-y-1 text-sm">
-                                    <li>The voice samples may be incomplete sentence fragments (1-1.5 seconds long)</li>
-                                    <li>Focus on voice quality, tone, pitch, and overall sound characteristics</li>
-                                    <li><strong>Ignore the linguistic content</strong> - different speakers may say different things</li>
-                                    <li>Base your judgments purely on acoustic similarity of the voices</li>
-                                </ul>
-                            </div>
-
                             <div class="p-4 bg-indigo-50 rounded-lg">
                                 <h2 class="font-semibold text-lg mb-2">Your Task:</h2>
                                 <p>You will arrange ${numSamples} voice samples (numbered 1-${numSamples}) in a 2D space based on how similar they sound to you.</p>
@@ -519,10 +227,10 @@ function renderComplete() {
                                 </ul>
                             </div>
 
-                            <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                            <div class="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
                                 <p class="text-sm">
-                                    <strong>Remember:</strong> Your perception is subjective and valuable. 
-                                    Arrange the voices based on how they SOUND to YOU, not what they are saying.
+                                    <strong>Important:</strong> Your perception is subjective and valuable. 
+                                    Arrange the voices based on what sounds similar or different to YOU personally.
                                 </p>
                             </div>
                         </div>
@@ -642,7 +350,7 @@ function renderComplete() {
 
                             <div class="pt-4 border-t border-gray-200">
                                 <p class="text-sm text-gray-600 text-center mb-4">
-                                    Please send your downloaded results file to the researcher.
+                                    Please email your downloaded results to shettyvishwas@ucla.edu.
                                 </p>
                                 <button
                                     onclick="window.location.reload()"
@@ -659,6 +367,22 @@ function renderComplete() {
 
         // Core functions
         async function startLoading() {
+            const participantInput = document.getElementById('participantId');
+            const trialSelect = document.getElementById('trialSelect');
+            
+            state.participantId = participantInput.value.trim();
+            state.selectedTrial = trialSelect.value;
+            
+            if (!state.participantId) {
+                alert('Please enter a participant ID');
+                return;
+            }
+
+            if (!state.selectedTrial) {
+                alert('Please select a trial');
+                return;
+            }
+
             state.stage = 'loading';
             render();
 
@@ -918,7 +642,6 @@ function renderComplete() {
                 participantId: state.participantId,
                 trialId: state.selectedTrial,
                 timestamp: new Date().toISOString(),
-                demographics: state.demographics,
                 positions: state.audioMapping.map((audio, i) => ({
                     circle: i + 1,
                     filename: audio.filename,
