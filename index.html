@@ -1,128 +1,4 @@
-function renderComplete() {
-            return `
-                <div class="p-8">
-                    <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8">
-                        <div class="text-center mb-8">
-                            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                </svg>
-                            </div>
-                            <h1 class="text-3xl font-bold text-gray-800 mb-2">Test Complete!</h1>
-                            <p class="text-gray-600">Thank you for participating, ${state.participantId}</p>
-                            <p class="text-sm text-gray-500 mt-2">Trial: ${state.selectedTrial.replace(/_/g, " ")}</p>
-                        </div>
-
-                        <div class="space-y-4">
-                            <div class="p-4 bg-gray-50 rounded-lg">
-                                <h2 class="font-semibold mb-2">Results Summary:</h2>
-                                <ul class="text-sm text-gray-700 space-y-1">
-                                    <li>• Voice samples arranged: ${state.audioMapping.length}</li>
-                                    <li>• Unique pairwise distances: ${(state.audioMapping.length * (state.audioMapping.length - 1)) / 2}</li>
-                                    <li>• Coordinates normalized to 0-1 scale</li>
-                                </ul>
-                            </div>
-
-                            <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                                <h3 class="font-semibold text-blue-900 mb-3">Submit Your Results</h3>
-                                <p class="text-sm text-gray-700 mb-4">
-                                    Click the button below to automatically send your results to the researcher via email.
-                                </p>
-                                <button
-                                    onclick="submitResults()"
-                                    id="submitButton"
-                                    class="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                                >
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                                    </svg>
-                                    Email Results to Researcher
-                                </button>
-                                <p id="submitStatus" class="text-sm mt-2 text-center"></p>
-                            </div>
-
-                            <div class="p-4 bg-gray-50 rounded-lg border border-gray-300">
-                                <h3 class="font-semibold text-gray-800 mb-2">Or Download Results Manually</h3>
-                                <p class="text-xs text-gray-600 mb-3">If email submission doesn't work, you can download and send the files manually.</p>
-                                <div class="space-y-2">
-                                    <button
-                                        onclick="exportResults()"
-                                        class="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm"
-                                    >
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                                        </svg>
-                                        Download JSON
-                                    </button>
-                                    
-                                    <button
-                                        onclick="exportCSV()"
-                                        class="w-full flex items-center justify-center gap-2 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors text-sm"
-                                    >
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                                        </svg>
-                                        Download CSV
-                                    </button>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-2">
-                                    Then email the files to: <strong>shettyvishwas@ucla.edu</strong>
-                                </p>
-                            </div>
-
-                            <div class="pt-4 border-t border-gray-200">
-                                <button
-                                    onclick="window.location.reload()"
-                                    class="w-full text-indigo-600 hover:text-indigo-800 transition-colors py-2"
-                                >
-                                    Start Another Trial
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function submitResults() {
-            const button = document.getElementById('submitButton');
-            const status = document.getElementById('submitStatus');
-            
-            button.disabled = true;
-            button.innerHTML = '<span class="animate-pulse">Sending...</span>';
-            status.textContent = '';
-
-            const results = {
-                participantId: state.participantId,
-                trialId: state.selectedTrial,
-                timestamp: new Date().toISOString(),
-                demographics: state.demographics,
-                positions: state.audioMapping.map((audio, i) => ({
-                    circle: i + 1,
-                    filename: audio.filename,
-                    x: state.positions[i].x.toFixed(6),
-                    y: state.positions[i].y.toFixed(6)
-                })),
-                distances: calculateDistances()
-            };
-
-            const jsonData = JSON.stringify(results, null, 2);
-            const csvData = generateCSVData();
-
-            // Create mailto link with results
-            const subject = encodeURIComponent(`Voice Perception Test Results - ${state.participantId} - ${state.selectedTrial}`);
-            const body = encodeURIComponent(
-                `Results for Participant: ${state.participantId}\n` +
-                `Trial: ${state.selectedTrial}\n` +
-                `Completed: ${new Date().toLocaleString()}\n\n` +
-                `Demographics:\n` +
-                `- Listening Device: ${state.demographics.listeningDevice}\n` +
-                `- Music Background: ${state.demographics.musicBackground}\n` +
-                `- Language Background: ${state.demographics.languageBackground}\n` +
-                `- First Language: ${state.demographics.firstLanguage || 'N/A'}\n` +
-                `- Languages Spoken: ${state.demographics.otherLanguages}\n` +
-                `- Age: ${state.demographics.age}\n\n` +
-                `Please download the attached JSON file for complete results data.`<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -139,7 +15,7 @@ function renderComplete() {
     <div id="app"></div>
 
     <script>
-        // CONFIGURATION: Update with your GitHub repository details
+        // CONFIGURATION
         const CONFIG = {
             githubUser: 'yttehs',
             githubRepo: 'Listening_Test',
@@ -172,10 +48,9 @@ function renderComplete() {
             currentSource: null
         };
 
-        // Canvas configuration
         const canvasSize = Math.min(window.innerWidth - 100, 800);
 
-        // Initialize - Load available trials
+        // Initialize
         async function initialize() {
             try {
                 const trialsUrl = `https://raw.githubusercontent.com/${CONFIG.githubUser}/${CONFIG.githubRepo}/${CONFIG.githubBranch}/trials_list.json`;
@@ -185,7 +60,6 @@ function renderComplete() {
                     const data = await response.json();
                     state.availableTrials = data.trials;
                 } else {
-                    // Fallback: generate trial list if trials_list.json doesn't exist
                     state.availableTrials = generateDefaultTrials();
                 }
             } catch (error) {
@@ -216,7 +90,6 @@ function renderComplete() {
             return trials;
         }
 
-        // Render functions
         function render() {
             const app = document.getElementById('app');
             
@@ -257,9 +130,7 @@ function renderComplete() {
                                 </svg>
                                 <div class="text-sm text-gray-700">
                                     <p class="font-semibold mb-2">Welcome!</p>
-                                    <p class="mb-2">
-                                        In this test, you will listen to voice samples and arrange them in a 2D space based on how similar they sound to you.
-                                    </p>
+                                    <p class="mb-2">In this test, you will listen to voice samples and arrange them in a 2D space based on how similar they sound to you.</p>
                                     <p>The test will take approximately 15-20 minutes to complete.</p>
                                 </div>
                             </div>
@@ -267,21 +138,12 @@ function renderComplete() {
 
                         <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Participant ID *</label>
-                            <input
-                                type="text"
-                                id="participantId"
-                                value="${state.participantId}"
-                                placeholder="Enter your unique participant ID"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                            />
+                            <input type="text" id="participantId" value="${state.participantId}" placeholder="Enter your unique participant ID" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"/>
                         </div>
 
                         <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Select Trial *</label>
-                            <select
-                                id="trialSelect"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                            >
+                            <select id="trialSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
                                 <option value="">-- Select a trial --</option>
                                 ${trialsOptions}
                             </select>
@@ -294,10 +156,7 @@ function renderComplete() {
                             <div class="space-y-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Listening Device *</label>
-                                    <select
-                                        id="listeningDevice"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                    >
+                                    <select id="listeningDevice" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                                         <option value="">-- Select --</option>
                                         <option value="headphones">Headphones</option>
                                         <option value="earphones">Earphones</option>
@@ -307,10 +166,7 @@ function renderComplete() {
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Do you have a background in music? *</label>
-                                    <select
-                                        id="musicBackground"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                    >
+                                    <select id="musicBackground" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                                         <option value="">-- Select --</option>
                                         <option value="yes">Yes</option>
                                         <option value="no">No</option>
@@ -319,11 +175,7 @@ function renderComplete() {
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Language Background *</label>
-                                    <select
-                                        id="languageBackground"
-                                        onchange="toggleFirstLanguage()"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                    >
+                                    <select id="languageBackground" onchange="toggleFirstLanguage()" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                                         <option value="">-- Select --</option>
                                         <option value="native">Native English Speaker</option>
                                         <option value="non-native">Non-Native English Speaker</option>
@@ -332,43 +184,22 @@ function renderComplete() {
 
                                 <div id="firstLanguageDiv" style="display: none;">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">What is your first language? *</label>
-                                    <input
-                                        type="text"
-                                        id="firstLanguage"
-                                        placeholder="e.g., Spanish, Mandarin, Hindi"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                    />
+                                    <input type="text" id="firstLanguage" placeholder="e.g., Spanish, Mandarin, Hindi" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"/>
                                 </div>
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">What languages do you speak? *</label>
-                                    <input
-                                        type="text"
-                                        id="otherLanguages"
-                                        placeholder="e.g., English, Spanish, French"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                    />
+                                    <input type="text" id="otherLanguages" placeholder="e.g., English, Spanish, French" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"/>
                                 </div>
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Age *</label>
-                                    <input
-                                        type="number"
-                                        id="age"
-                                        placeholder="Enter your age"
-                                        min="18"
-                                        max="100"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                    />
+                                    <input type="number" id="age" placeholder="Enter your age" min="18" max="100" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"/>
                                 </div>
                             </div>
                         </div>
 
-                        <button
-                            onclick="validateAndStart()"
-                            id="loadButton"
-                            class="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
-                        >
+                        <button onclick="validateAndStart()" id="loadButton" class="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium">
                             Load Audio Files & Continue
                         </button>
                     </div>
@@ -383,7 +214,6 @@ function renderComplete() {
         }
 
         function validateAndStart() {
-            // Get all values
             state.participantId = document.getElementById('participantId').value.trim();
             state.selectedTrial = document.getElementById('trialSelect').value;
             state.demographics.listeningDevice = document.getElementById('listeningDevice').value;
@@ -393,48 +223,39 @@ function renderComplete() {
             state.demographics.otherLanguages = document.getElementById('otherLanguages').value.trim();
             state.demographics.age = document.getElementById('age').value;
 
-            // Validate required fields
             if (!state.participantId) {
                 alert('Please enter a participant ID');
                 return;
             }
-
             if (!state.selectedTrial) {
                 alert('Please select a trial');
                 return;
             }
-
             if (!state.demographics.listeningDevice) {
                 alert('Please select your listening device');
                 return;
             }
-
             if (!state.demographics.musicBackground) {
                 alert('Please indicate if you have a music background');
                 return;
             }
-
             if (!state.demographics.languageBackground) {
                 alert('Please select your language background');
                 return;
             }
-
             if (state.demographics.languageBackground === 'non-native' && !state.demographics.firstLanguage) {
                 alert('Please enter your first language');
                 return;
             }
-
             if (!state.demographics.otherLanguages) {
                 alert('Please list the languages you speak');
                 return;
             }
-
             if (!state.demographics.age || state.demographics.age < 18) {
                 alert('Please enter a valid age (18 or older)');
                 return;
             }
 
-            // All validated, proceed
             startLoading();
         }
 
@@ -527,10 +348,7 @@ function renderComplete() {
                             </div>
                         </div>
 
-                        <button
-                            onclick="startTest()"
-                            class="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium text-lg"
-                        >
+                        <button onclick="startTest()" class="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium text-lg">
                             Start Test
                         </button>
                     </div>
@@ -549,19 +367,13 @@ function renderComplete() {
                                     <p class="text-gray-600">Participant: ${state.participantId} | Trial: ${state.selectedTrial.replace(/_/g, " ")}</p>
                                 </div>
                                 <div class="flex gap-2">
-                                    <button
-                                        onclick="resetPositions()"
-                                        class="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                                    >
+                                    <button onclick="resetPositions()" class="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                                         </svg>
                                         Reset
                                     </button>
-                                    <button
-                                        onclick="completeTest()"
-                                        class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
-                                    >
+                                    <button onclick="completeTest()" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">
                                         Complete Test
                                     </button>
                                 </div>
@@ -578,12 +390,7 @@ function renderComplete() {
                                 </p>
                             </div>
                             
-                            <canvas
-                                id="canvas"
-                                width="${canvasSize}"
-                                height="${canvasSize}"
-                                class="cursor-pointer border border-gray-300 rounded-lg mx-auto block"
-                            ></canvas>
+                            <canvas id="canvas" width="${canvasSize}" height="${canvasSize}" class="cursor-pointer border border-gray-300 rounded-lg mx-auto block"></canvas>
                             <p class="text-sm text-gray-500 mt-4 text-center">
                                 Similar voices should be close together. Different voices should be far apart.
                             </p>
@@ -618,36 +425,45 @@ function renderComplete() {
                                 </ul>
                             </div>
 
-                            <div class="space-y-3">
-                                <button
-                                    onclick="exportResults()"
-                                    class="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
-                                >
+                            <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                <h3 class="font-semibold text-blue-900 mb-3">Submit Your Results</h3>
+                                <p class="text-sm text-gray-700 mb-4">
+                                    Click the button below to download your results and open your email to send them to the researcher.
+                                </p>
+                                <button onclick="submitResults()" id="submitButton" class="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                                     </svg>
-                                    Download Results (JSON)
+                                    Submit Results via Email
                                 </button>
-                                
-                                <button
-                                    onclick="exportCSV()"
-                                    class="w-full flex items-center justify-center gap-2 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-medium"
-                                >
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                                    </svg>
-                                    Download Distance Matrix (CSV)
-                                </button>
+                                <p id="submitStatus" class="text-sm mt-2 text-center"></p>
+                            </div>
+
+                            <div class="p-4 bg-gray-50 rounded-lg border border-gray-300">
+                                <h3 class="font-semibold text-gray-800 mb-2">Or Download Results Manually</h3>
+                                <p class="text-xs text-gray-600 mb-3">If email doesn't work, you can download and send the files manually.</p>
+                                <div class="space-y-2">
+                                    <button onclick="exportResults()" class="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                        </svg>
+                                        Download JSON
+                                    </button>
+                                    
+                                    <button onclick="exportCSV()" class="w-full flex items-center justify-center gap-2 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors text-sm">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                        </svg>
+                                        Download CSV
+                                    </button>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2">
+                                    Then email the files to: <strong>shettyvishwas@ucla.edu</strong>
+                                </p>
                             </div>
 
                             <div class="pt-4 border-t border-gray-200">
-                                <p class="text-sm text-gray-600 text-center mb-4">
-                                    Please send your downloaded results file to the researcher.
-                                </p>
-                                <button
-                                    onclick="window.location.reload()"
-                                    class="w-full text-indigo-600 hover:text-indigo-800 transition-colors py-2"
-                                >
+                                <button onclick="window.location.reload()" class="w-full text-indigo-600 hover:text-indigo-800 transition-colors py-2">
                                     Start Another Trial
                                 </button>
                             </div>
@@ -832,7 +648,6 @@ function renderComplete() {
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Draw grid
             ctx.strokeStyle = '#e5e7eb';
             ctx.lineWidth = 1;
             for (let i = 0; i <= 10; i++) {
@@ -847,12 +662,10 @@ function renderComplete() {
                 ctx.stroke();
             }
             
-            // Draw border
             ctx.strokeStyle = '#9ca3af';
             ctx.lineWidth = 2;
             ctx.strokeRect(0, 0, canvas.width, canvas.height);
             
-            // Draw circles
             for (let i = 0; i < state.audioMapping.length; i++) {
                 const pos = state.positions[i];
                 const x = pos.x * canvas.width;
@@ -913,6 +726,49 @@ function renderComplete() {
             return distances;
         }
 
+        function submitResults() {
+            const button = document.getElementById('submitButton');
+            const status = document.getElementById('submitStatus');
+            
+            button.disabled = true;
+            button.innerHTML = '<span class="animate-pulse">Preparing files...</span>';
+            status.textContent = '';
+
+            const subject = encodeURIComponent(`Voice Perception Test Results - ${state.participantId} - ${state.selectedTrial}`);
+            const body = encodeURIComponent(
+                `Hello,\n\n` +
+                `Please find attached the results for:\n\n` +
+                `Participant ID: ${state.participantId}\n` +
+                `Trial: ${state.selectedTrial}\n` +
+                `Completed: ${new Date().toLocaleString()}\n\n` +
+                `Demographics:\n` +
+                `- Listening Device: ${state.demographics.listeningDevice}\n` +
+                `- Music Background: ${state.demographics.musicBackground}\n` +
+                `- Language Background: ${state.demographics.languageBackground}\n` +
+                `- First Language: ${state.demographics.firstLanguage || 'N/A'}\n` +
+                `- Languages Spoken: ${state.demographics.otherLanguages}\n` +
+                `- Age: ${state.demographics.age}\n\n` +
+                `I have attached the JSON and CSV files containing the complete test results.\n\n` +
+                `Best regards`
+            );
+
+            exportResults();
+            setTimeout(() => exportCSV(), 500);
+            
+            setTimeout(() => {
+                window.location.href = `mailto:shettyvishwas@ucla.edu?subject=${subject}&body=${body}`;
+                
+                button.disabled = false;
+                button.innerHTML = `
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    Submit Results via Email
+                `;
+                status.innerHTML = '<span class="text-green-600 font-medium">✓ Files downloaded! Email opened. Please attach the files and send.</span>';
+            }, 1000);
+        }
+
         function exportResults() {
             const results = {
                 participantId: state.participantId,
@@ -951,7 +807,6 @@ function renderComplete() {
             a.click();
         }
 
-        // Initialize on page load
         initialize();
     </script>
 </body>
