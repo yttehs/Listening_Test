@@ -16,16 +16,12 @@
 
     <script>
         // CONFIGURATION
-        //const CONFIG = {
-        //    githubUser: 'yttehs',
-        //    githubRepo: 'Listening_Test',
-        //    githubBranch: 'main'
-        //};
-
+        const GOOGLE_FORM_TEMPLATE = "https://docs.google.com/forms/d/e/1FAIpQLSd_MLDI7vuQN1c70_o5-szCioVbmrUKUKpHhtInxQ0tCnGREQ/viewform?usp=pp_url&entry.16675421=PARTICIPANT_ID&entry.623538109=TRIAL_NAME&entry.1036755193=LISTENING_DEVICE&entry.1172676033=MUSIC_BACKGROUND&entry.1771353994=LANGUAGE_BACKGROUND&entry.1783695746=FIRST_LANGUAGE&entry.1207484341=OTHER_LANGUAGES&entry.1419101100=AGE";  // UPDATE THIS!
+        
         const CONFIG = {
-            audioBaseUrl: 'https://listening-test-audio-files.s3.amazonaws.com',
-            apiEndpoint: 'https://YOUR-API-ID.execute-api.REGION.amazonaws.com/prod/submit-results',
-            useAWS: true
+            githubUser: 'yttehs',
+            githubRepo: 'Listening_Test',
+            githubBranch: 'main'
         };
 
         // State management
@@ -136,7 +132,7 @@
                                 </svg>
                                 <div class="text-sm text-gray-700">
                                     <p class="font-semibold mb-2">Welcome!</p>
-                                    <p class="mb-2">In this test, you will listen to voice samples and arrange them within the space bounded by square box based on how similar they sound to you.</p>
+                                    <p class="mb-2">In this test, you will listen to voice samples and arrange them in a 2D space based on how similar they sound to you.</p>
                                     <p>The test will take approximately 15-20 minutes to complete.</p>
                                 </div>
                             </div>
@@ -323,7 +319,7 @@
 
                             <div class="p-4 bg-indigo-50 rounded-lg">
                                 <h2 class="font-semibold text-lg mb-2">Your Task:</h2>
-                                <p>You will arrange ${numSamples} voice samples (numbered 1-${numSamples}) within the space bounded by a square box based on how similar they sound to you.</p>
+                                <p>You will arrange ${numSamples} voice samples (numbered 1-${numSamples}) in a 2D space based on how similar they sound to you.</p>
                             </div>
 
                             <div class="p-4 bg-gray-50 rounded-lg">
@@ -417,7 +413,7 @@
                                 </svg>
                             </div>
                             <h1 class="text-3xl font-bold text-gray-800 mb-2">Test Complete!</h1>
-                            <p class="text-gray-600">Thank you for participating, ${state.participantId}</p>
+                            <p class="text-gray-600">Thank you for completing the test, ${state.participantId}</p>
                             <p class="text-sm text-gray-500 mt-2">Trial: ${state.selectedTrial.replace(/_/g, " ")}</p>
                         </div>
 
@@ -431,46 +427,63 @@
                                 </ul>
                             </div>
 
-                            <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                                <h3 class="font-semibold text-blue-900 mb-3">Submit Your Results</h3>
-                                <p class="text-sm text-gray-700 mb-4">
-                                    Click the button below to download your results and open your email to send them to the researcher.
+                            <div class="p-4 bg-blue-50 rounded-lg border-2 border-blue-300">
+                                <h3 class="font-semibold text-blue-900 mb-3">📤 Submit Your Results</h3>
+                                <p class="text-sm text-gray-700 mb-3">
+                                    Please follow these steps to submit your results:
                                 </p>
-                                <button onclick="submitResults()" id="submitButton" class="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                                    </svg>
-                                    Submit Results via Email
-                                </button>
-                                <p id="submitStatus" class="text-sm mt-2 text-center"></p>
-                            </div>
-
-                            <div class="p-4 bg-gray-50 rounded-lg border border-gray-300">
-                                <h3 class="font-semibold text-gray-800 mb-2">Or Download Results Manually</h3>
-                                <p class="text-xs text-gray-600 mb-3">If email doesn't work, you can download and send the files manually.</p>
-                                <div class="space-y-2">
-                                    <button onclick="exportResults()" class="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <ol class="text-sm text-gray-700 space-y-2 mb-4 list-decimal list-inside">
+                                    <li><strong>Download both files</strong> using the buttons below</li>
+                                    <li><strong>Open the pre-filled submission form</strong> (your info is already filled in!)</li>
+                                    <li><strong>Upload both files</strong> to the form and submit</li>
+                                </ol>
+                                
+                                <div class="space-y-2 mb-4">
+                                    <button
+                                        onclick="exportResults()"
+                                        class="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+                                    >
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                                         </svg>
-                                        Download JSON
+                                        1. Download JSON File
                                     </button>
                                     
-                                    <button onclick="exportCSV()" class="w-full flex items-center justify-center gap-2 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors text-sm">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <button
+                                        onclick="exportCSV()"
+                                        class="w-full flex items-center justify-center gap-2 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-medium"
+                                    >
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                                         </svg>
-                                        Download CSV
+                                        2. Download CSV File
                                     </button>
                                 </div>
-                                <p class="text-xs text-gray-500 mt-2">
-                                    Then email the files to: <strong>shettyvishwas@ucla.edu</strong>
+
+                                <a
+                                    href="javascript:void(0)"
+                                    onclick="window.open(getPrefilledFormURL(), '_blank')"
+                                    class="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium block text-center"
+                                >
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    3. Open Submission Form (Pre-filled)
+                                </a>
+                            </div>
+
+                            <div class="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                                <p class="text-sm text-gray-700">
+                                    <strong>Note:</strong> Your information will be automatically filled in the form. You only need to upload the two files!
                                 </p>
                             </div>
 
                             <div class="pt-4 border-t border-gray-200">
-                                <button onclick="window.location.reload()" class="w-full text-indigo-600 hover:text-indigo-800 transition-colors py-2">
-                                    Start Another Trial
+                                <button
+                                    onclick="window.location.reload()"
+                                    class="w-full text-indigo-600 hover:text-indigo-800 transition-colors py-2 font-medium"
+                                >
+                                    Complete Another Trial
                                 </button>
                             </div>
                         </div>
