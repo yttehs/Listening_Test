@@ -16,10 +16,16 @@
 
     <script>
         // CONFIGURATION
+        //const CONFIG = {
+        //    githubUser: 'yttehs',
+        //    githubRepo: 'Listening_Test',
+        //    githubBranch: 'main'
+        //};
+
         const CONFIG = {
-            githubUser: 'yttehs',
-            githubRepo: 'Listening_Test',
-            githubBranch: 'main'
+            audioBaseUrl: 'https://listening-test-audio-files.s3.amazonaws.com',
+            apiEndpoint: 'https://YOUR-API-ID.execute-api.REGION.amazonaws.com/prod/submit-results',
+            useAWS: true
         };
 
         // State management
