@@ -1,0 +1,146 @@
+{
+  "participants": {
+    "P001": {
+      "name": "Participant 001",
+      "assignedTrials": [
+        "Male_read_MG1_MG2",
+        "Male_read_MG1_MG3",
+        "Male_read_MG1_MG4",
+        "Male_read_MG2_MG3",
+        "Male_read_MG2_MG4",
+        "Male_read_MG3_MG4"
+      ]
+    },
+    "P002": {
+      "name": "Participant 002",
+      "assignedTrials": [
+        "Female_read_MG1_MG2",
+        "Female_read_MG1_MG3",
+        "Female_read_MG1_MG4",
+        "Female_read_MG2_MG3",
+        "Female_read_MG2_MG4",
+        "Female_read_MG3_MG4"
+      ]
+    },
+    "P003": {
+      "name": "Participant 003",
+      "assignedTrials": [
+        "Male_conv_MG1_MG2",
+        "Male_conv_MG1_MG3",
+        "Male_conv_MG1_MG4",
+        "Male_conv_MG2_MG3",
+        "Male_conv_MG2_MG4",
+        "Male_conv_MG3_MG4"
+      ]
+    },
+    "P004": {
+      "name": "Participant 004",
+      "assignedTrials": [
+        "Female_conv_MG1_MG2",
+        "Female_conv_MG1_MG3",
+        "Female_conv_MG1_MG4",
+        "Female_conv_MG2_MG3",
+        "Female_conv_MG2_MG4",
+        "Female_conv_MG3_MG4"
+      ]
+    }
+  },
+  "trialInfo": {
+    "Male_read_MG1_MG2": {
+      "name": "Male Read MG1 MG2",
+      "numFiles": 24
+    },
+    "Male_read_MG1_MG3": {
+      "name": "Male Read MG1 MG3",
+      "numFiles": 25
+    },
+    "Male_read_MG1_MG4": {
+      "name": "Male Read MG1 MG4",
+      "numFiles": 26
+    },
+    "Male_read_MG2_MG3": {
+      "name": "Male Read MG2 MG3",
+      "numFiles": 25
+    },
+    "Male_read_MG2_MG4": {
+      "name": "Male Read MG2 MG4",
+      "numFiles": 26
+    },
+    "Male_read_MG3_MG4": {
+      "name": "Male Read MG3 MG4",
+      "numFiles": 26
+    },
+    "Male_conv_MG1_MG2": {
+      "name": "Male Conv MG1 MG2",
+      "numFiles": 24
+    },
+    "Male_conv_MG1_MG3": {
+      "name": "Male Conv MG1 MG3",
+      "numFiles": 25
+    },
+    "Male_conv_MG1_MG4": {
+      "name": "Male Conv MG1 MG4",
+      "numFiles": 26
+    },
+    "Male_conv_MG2_MG3": {
+      "name": "Male Conv MG2 MG3",
+      "numFiles": 25
+    },
+    "Male_conv_MG2_MG4": {
+      "name": "Male Conv MG2 MG4",
+      "numFiles": 26
+    },
+    "Male_conv_MG3_MG4": {
+      "name": "Male Conv MG3 MG4",
+      "numFiles": 26
+    },
+    "Female_read_MG1_MG2": {
+      "name": "Female Read MG1 MG2",
+      "numFiles": 24
+    },
+    "Female_read_MG1_MG3": {
+      "name": "Female Read MG1 MG3",
+      "numFiles": 25
+    },
+    "Female_read_MG1_MG4": {
+      "name": "Female Read MG1 MG4",
+      "numFiles": 26
+    },
+    "Female_read_MG2_MG3": {
+      "name": "Female Read MG2 MG3",
+      "numFiles": 25
+    },
+    "Female_read_MG2_MG4": {
+      "name": "Female Read MG2 MG4",
+      "numFiles": 26
+    },
+    "Female_read_MG3_MG4": {
+      "name": "Female Read MG3 MG4",
+      "numFiles": 26
+    },
+    "Female_conv_MG1_MG2": {
+      "name": "Female Conv MG1 MG2",
+      "numFiles": 24
+    },
+    "Female_conv_MG1_MG3": {
+      "name": "Female Conv MG1 MG3",
+      "numFiles": 25
+    },
+    "Female_conv_MG1_MG4": {
+      "name": "Female Conv MG1 MG4",
+      "numFiles": 26
+    },
+    "Female_conv_MG2_MG3": {
+      "name": "Female Conv MG2 MG3",
+      "numFiles": 24
+    },
+    "Female_conv_MG2_MG4": {
+      "name": "Female Conv MG2 MG4",
+      "numFiles": 24
+    },
+    "Female_conv_MG3_MG4": {
+      "name": "Female Conv MG3 MG4",
+      "numFiles": 24
+    }
+  }
+}
