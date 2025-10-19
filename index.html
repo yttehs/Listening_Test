@@ -21,7 +21,7 @@
         // Get this from: Google Form → ⋮ menu → Get pre-filled link
         // Use these EXACT placeholders: PARTICIPANT_ID, TRIAL_NAME, LISTENING_DEVICE,
         // MUSIC_BACKGROUND, LANGUAGE_BACKGROUND, FIRST_LANGUAGE, OTHER_LANGUAGES, AGE
- 	const GOOGLE_FORM_TEMPLATE = "https://docs.google.com/forms/d/e/1FAIpQLSd_MLDI7vuQN1c70_o5-szCioVbmrUKUKpHhtInxQ0tCnGREQ/viewform?usp=pp_url&entry.16675421=PARTICIPANT_ID&entry.623538109=TRIAL_NAME&entry.1036755193=LISTENING_DEVICE&entry.1172676033=MUSIC_BACKGROUND&entry.1771353994=LANGUAGE_BACKGROUND&entry.1783695746=FIRST_LANGUAGE&entry.1207484341=OTHER_LANGUAGES&entry.1419101100=AGE"
+        const GOOGLE_FORM_TEMPLATE = "https://docs.google.com/forms/d/e/1FAIpQLSd_MLDI7vuQN1c70_o5-szCioVbmrUKUKpHhtInxQ0tCnGREQ/viewform?usp=pp_url&entry.16675421=PARTICIPANT_ID&entry.623538109=TRIAL_NAME&entry.1036755193=LISTENING_DEVICE&entry.1172676033=MUSIC_BACKGROUND&entry.1771353994=LANGUAGE_BACKGROUND&entry.1783695746=FIRST_LANGUAGE&entry.1207484341=OTHER_LANGUAGES&entry.1419101100=AGE"
         
         // GitHub repository details
         const CONFIG = {
@@ -77,41 +77,98 @@
         // Initialize
         async function initialize() {
             try {
-                const trialsUrl = `https://raw.githubusercontent.com/${CONFIG.githubUser}/${CONFIG.githubRepo}/${CONFIG.githubBranch}/trials_list.json`;
-                const response = await fetch(trialsUrl);
+                const assignmentsUrl = `https://raw.githubusercontent.com/${CONFIG.githubUser}/${CONFIG.githubRepo}/${CONFIG.githubBranch}/${CONFIG.participantAssignmentsFile}`;
+                const response = await fetch(assignmentsUrl);
                 
                 if (response.ok) {
-                    const data = await response.json();
-                    state.availableTrials = data.trials;
+                    state.participantAssignments = await response.json();
                 } else {
-                    state.availableTrials = generateDefaultTrials();
+                    console.error('Could not load participant assignments');
+                    state.participantAssignments = { participants: {}, trialInfo: {} };
                 }
             } catch (error) {
-                console.error('Error loading trials list:', error);
-                state.availableTrials = generateDefaultTrials();
+                console.error('Error loading participant assignments:', error);
+                state.participantAssignments = { participants: {}, trialInfo: {} };
             }
             render();
         }
 
-        function generateDefaultTrials() {
-            const trials = [];
-            const genders = ["Male", "Female"];
-            const styles = ["read", "conv"];
-            const mgCombos = ["MG1_MG2", "MG1_MG3", "MG1_MG4", "MG2_MG3", "MG2_MG4", "MG3_MG4"];
-            
-            for (let gender of genders) {
-                for (let style of styles) {
-                    for (let mg of mgCombos) {
-                        const trialId = `${gender}_${style}_${mg}`;
-                        trials.push({
-                            id: trialId,
-                            name: trialId.replace(/_/g, " "),
-                            numFiles: 24
-                        });
-                    }
-                }
+        function loadTrialsForParticipant(participantId) {
+            if (!state.participantAssignments) {
+                return [];
             }
-            return trials;
+
+            const participant = state.participantAssignments.participants[participantId.toUpperCase()];
+            
+            if (!participant) {
+                return [];
+            }
+
+            // Map assigned trial IDs to trial objects with display info
+            return participant.assignedTrials.map(trialId => {
+                const trialInfo = state.participantAssignments.trialInfo[trialId];
+                return {
+                    id: trialId,
+                    name: trialInfo ? trialInfo.name : trialId.replace(/_/g, " "),
+                    numFiles: trialInfo ? trialInfo.numFiles : 24
+                };
+            });
+        }
+
+        function checkParticipantId() {
+            const participantInput = document.getElementById('participantId');
+            const trialSelectDiv = document.getElementById('trialSelectDiv');
+            const trialSelect = document.getElementById('trialSelect');
+            const participantError = document.getElementById('participantError');
+            
+            const participantId = participantInput.value.trim().toUpperCase();
+            
+            console.log('Checking participant ID:', participantId);
+            console.log('Participant assignments loaded:', state.participantAssignments ? 'Yes' : 'No');
+            
+            if (!participantId) {
+                trialSelectDiv.style.display = 'none';
+                participantError.style.display = 'none';
+                return;
+            }
+
+            if (!state.participantAssignments || !state.participantAssignments.participants) {
+                participantError.style.display = 'block';
+                participantError.innerHTML = `
+                    <div class="p-3 bg-red-50 border border-red-300 rounded-lg text-sm text-red-800">
+                        <strong>Error:</strong> Participant assignments file not loaded. Please refresh the page or contact the researcher.
+                    </div>
+                `;
+                trialSelectDiv.style.display = 'none';
+                return;
+            }
+
+            const assignedTrials = loadTrialsForParticipant(participantId);
+            
+            console.log('Assigned trials for', participantId, ':', assignedTrials);
+            
+            if (assignedTrials.length === 0) {
+                participantError.style.display = 'block';
+                participantError.innerHTML = `
+                    <div class="p-3 bg-red-50 border border-red-300 rounded-lg text-sm text-red-800">
+                        <strong>Invalid Participant ID:</strong> "${participantId}" is not registered. Please check your ID or contact the researcher.
+                    </div>
+                `;
+                trialSelectDiv.style.display = 'none';
+                state.availableTrials = [];
+            } else {
+                participantError.style.display = 'none';
+                trialSelectDiv.style.display = 'block';
+                state.availableTrials = assignedTrials;
+                
+                // Update dropdown
+                const trialsOptions = assignedTrials.map(trial => 
+                    `<option value="${trial.id}">${trial.name} (${trial.numFiles} samples)</option>`
+                ).join('');
+                trialSelect.innerHTML = '<option value="">-- Select a trial --</option>' + trialsOptions;
+                
+                console.log('Updated trial dropdown with', assignedTrials.length, 'trials');
+            }
         }
 
         function render() {
@@ -138,10 +195,6 @@
         }
 
         function renderStart() {
-            const trialsOptions = state.availableTrials.map(trial => 
-                `<option value="${trial.id}">${trial.name} (${trial.numFiles} samples)</option>`
-            ).join('');
-
             return `
                 <div class="p-8">
                     <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8">
@@ -162,16 +215,30 @@
 
                         <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Participant ID *</label>
-                            <input type="text" id="participantId" value="${state.participantId}" placeholder="Enter your unique participant ID" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"/>
+                            <input 
+                                type="text" 
+                                id="participantId" 
+                                value="${state.participantId}" 
+                                placeholder="Enter your participant ID (e.g., P001)" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            />
+                            <button 
+                                onclick="checkParticipantId()" 
+                                class="mt-2 px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors"
+                            >
+                                Check ID
+                            </button>
+                            <p class="text-xs text-gray-500 mt-1">Enter your ID and click "Check ID"</p>
                         </div>
 
-                        <div class="mb-6">
+                        <div id="participantError" style="display: none;" class="mb-6"></div>
+
+                        <div id="trialSelectDiv" style="display: none;" class="mb-6">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Select Trial *</label>
                             <select id="trialSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
                                 <option value="">-- Select a trial --</option>
-                                ${trialsOptions}
                             </select>
-                            <p class="text-xs text-gray-500 mt-2">Please select the trial assigned to you by the researcher.</p>
+                            <p class="text-xs text-gray-500 mt-2">These are the trials assigned to you.</p>
                         </div>
 
                         <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-300">
@@ -238,7 +305,7 @@
         }
 
         function validateAndStart() {
-            state.participantId = document.getElementById('participantId').value.trim();
+            state.participantId = document.getElementById('participantId').value.trim().toUpperCase();
             state.selectedTrial = document.getElementById('trialSelect').value;
             state.demographics.listeningDevice = document.getElementById('listeningDevice').value;
             state.demographics.musicBackground = document.getElementById('musicBackground').value;
@@ -251,10 +318,25 @@
                 alert('Please enter a participant ID');
                 return;
             }
+            
+            // Validate participant ID exists
+            if (!state.participantAssignments || !state.participantAssignments.participants[state.participantId]) {
+                alert('Invalid Participant ID. Please check your ID or contact the researcher.');
+                return;
+            }
+            
             if (!state.selectedTrial) {
                 alert('Please select a trial');
                 return;
             }
+            
+            // Validate trial is assigned to this participant
+            const participant = state.participantAssignments.participants[state.participantId];
+            if (!participant.assignedTrials.includes(state.selectedTrial)) {
+                alert('This trial is not assigned to you. Please select from your assigned trials.');
+                return;
+            }
+            
             if (!state.demographics.listeningDevice) {
                 alert('Please select your listening device');
                 return;
