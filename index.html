@@ -21,7 +21,7 @@
         // Get this from: Google Form → ⋮ menu → Get pre-filled link
         // Use these EXACT placeholders: PARTICIPANT_ID, TRIAL_NAME, LISTENING_DEVICE,
         // MUSIC_BACKGROUND, LANGUAGE_BACKGROUND, FIRST_LANGUAGE, OTHER_LANGUAGES, AGE
-        const GOOGLE_FORM_TEMPLATE = "https://docs.google.com/forms/d/e/1FAIpQLSd_MLDI7vuQN1c70_o5-szCioVbmrUKUKpHhtInxQ0tCnGREQ/viewform?usp=pp_url&entry.16675421=PARTICIPANT_ID&entry.623538109=TRIAL_NAME&entry.1036755193=LISTENING_DEVICE&entry.1172676033=MUSIC_BACKGROUND&entry.1771353994=LANGUAGE_BACKGROUND&entry.1783695746=FIRST_LANGUAGE&entry.1207484341=OTHER_LANGUAGES&entry.1419101100=AGE"
+        const GOOGLE_FORM_TEMPLATE = "https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform?usp=pp_url&entry.111=PARTICIPANT_ID&entry.222=TRIAL_NAME&entry.333=LISTENING_DEVICE&entry.444=MUSIC_BACKGROUND&entry.555=LANGUAGE_BACKGROUND&entry.666=FIRST_LANGUAGE&entry.777=OTHER_LANGUAGES&entry.888=AGE";
         
         // GitHub repository details
         const CONFIG = {
@@ -207,7 +207,7 @@
                                 </svg>
                                 <div class="text-sm text-gray-700">
                                     <p class="font-semibold mb-2">Welcome!</p>
-                                    <p class="mb-2">In this test, you will listen to voice samples and you will arrange them samples in the bounded space provided based on how similar they sound to you.</p>
+                                    <p class="mb-2">In this test, you will listen to voice samples and arrange them in a 2D space based on how similar they sound to you.</p>
                                     <p>The test will take approximately 15-20 minutes to complete.</p>
                                 </div>
                             </div>
@@ -404,7 +404,8 @@
                                 <ul class="list-disc list-inside space-y-1 text-sm">
                                     <li><strong>Take this test in a quiet room</strong> with minimal background noise</li>
                                     <li>Ensure your ${state.demographics.listeningDevice} are properly connected and working</li>
-                                    <li>Adjust your volume to a comfortable level before starting</li>
+                                    <li><strong>Set your volume to a comfortable level at the start</strong> and keep it constant throughout the test</li>
+                                    <li><strong>Listen to all voices at the same volume</strong> - do not adjust volume between samples</li>
                                 </ul>
                             </div>
 
@@ -423,15 +424,16 @@
 
                             <div class="p-4 bg-indigo-50 rounded-lg">
                                 <h2 class="font-semibold text-lg mb-2">Your Task:</h2>
-                                <p>You will arrange ${numSamples} voice samples (numbered 1-${numSamples}) in the bounded space provided based on how similar they sound to you.</p>
+                                <p>You will arrange ${numSamples} voice samples (numbered 1-${numSamples}) in a 2D space based on how similar they sound to you.</p>
                             </div>
 
                             <div class="p-4 bg-gray-50 rounded-lg">
                                 <h3 class="font-semibold mb-2">How to arrange voices:</h3>
                                 <ul class="list-disc list-inside space-y-2">
-                                    <li><strong>Similar-sounding voices</strong> → Place them close together</li>
+                                    <li><strong>Similar-sounding voices</strong> → Place them close together (can even overlap)</li>
                                     <li><strong>Different-sounding voices</strong> → Place them far apart</li>
-                                    <li>Use the entire bounded space to maximize differentiation</li>
+                                    <li><strong>Use the entire space</strong> - spread voices across the full canvas area</li>
+                                    <li>If voices sound very similar, you can place them on top of each other</li>
                                 </ul>
                             </div>
 
@@ -770,24 +772,12 @@
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            ctx.strokeStyle = '#e5e7eb';
-            ctx.lineWidth = 1;
-            for (let i = 0; i <= 10; i++) {
-                const pos = (i / 10) * canvas.width;
-                ctx.beginPath();
-                ctx.moveTo(pos, 0);
-                ctx.lineTo(pos, canvas.height);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(0, pos);
-                ctx.lineTo(canvas.width, pos);
-                ctx.stroke();
-            }
-            
+            // Draw border only (no grid)
             ctx.strokeStyle = '#9ca3af';
             ctx.lineWidth = 2;
             ctx.strokeRect(0, 0, canvas.width, canvas.height);
             
+            // Draw circles
             for (let i = 0; i < state.audioMapping.length; i++) {
                 const pos = state.positions[i];
                 const x = pos.x * canvas.width;
