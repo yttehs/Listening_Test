@@ -83,9 +83,9 @@ function validateAndStart() {
         // Get this from: Google Form → ⋮ menu → Get pre-filled link
         // Use these EXACT placeholders: PARTICIPANT_ID, TRIAL_NAME, LISTENING_DEVICE,
         // MUSIC_BACKGROUND, LANGUAGE_BACKGROUND, FIRST_LANGUAGE, OTHER_LANGUAGES, AGE
-	const GOOGLE_FORM_TEMPLATE = "https://docs.google.com/forms/d/e/1FAIpQLSd_MLDI7vuQN1c70_o5-szCioVbmrUKUKpHhtInxQ0tCnGREQ/viewform?usp=pp_url&entry.16675421=PARTICIPANT_ID&entry.1243735317=PARTICIPANT_EMAIL&entry.623538109=TRIAL_NAME&entry.1036755193=LISTENING_DEVICE&entry.1172676033=MUSIC_BACKGROUND&entry.1771353994=LANGUAGE_BACKGROUND&entry.1783695746=FIRST_LANGUAGE&entry.1207484341=OTHER_LANGUAGES&entry.1419101100=AGE";
-
-        // GitHub repository details
+        const GOOGLE_FORM_TEMPLATE = "https://docs.google.com/forms/d/e/1FAIpQLSd_MLDI7vuQN1c70_o5-szCioVbmrUKUKpHhtInxQ0tCnGREQ/viewform?usp=pp_url&entry.16675421=PARTICIPANT_ID&entry.1243735317=PARTICIPANT_EMAIL&entry.623538109=TRIAL_NAME&entry.1036755193=LISTENING_DEVICE&entry.1172676033=MUSIC_BACKGROUND&entry.1771353994=LANGUAGE_BACKGROUND&entry.1783695746=FIRST_LANGUAGE&entry.1207484341=OTHER_LANGUAGES&entry.1419101100=AGE"; 
+        
+	// GitHub repository details
         const CONFIG = {
             githubUser: 'yttehs',
             githubRepo: 'Listening_Test',
@@ -98,7 +98,8 @@ function validateAndStart() {
         function getPrefilledFormURL() {
             return GOOGLE_FORM_TEMPLATE
                 .replace('PARTICIPANT_ID', encodeURIComponent(state.participantId))
-                .replace('TRIAL_NAME', encodeURIComponent(state.selectedTrial))
+                .replace('PARTICIPANT_EMAIL', encodeURIComponent(state.emailId))
+		.replace('TRIAL_NAME', encodeURIComponent(state.selectedTrial))
                 .replace('LISTENING_DEVICE', encodeURIComponent(state.demographics.listeningDevice))
                 .replace('MUSIC_BACKGROUND', encodeURIComponent(state.demographics.musicBackground))
                 .replace('LANGUAGE_BACKGROUND', encodeURIComponent(state.demographics.languageBackground))
