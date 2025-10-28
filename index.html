@@ -101,6 +101,15 @@
 
         const canvasSize = Math.min(window.innerWidth - 100, 800);
 
+        // Helper function to get trial display name
+        function getTrialDisplayName() {
+            if (!state.selectedTrial || !state.participantAssignments) {
+                return 'Trial';
+            }
+            const trialInfo = state.participantAssignments.trialInfo[state.selectedTrial];
+            return trialInfo && trialInfo.displayName ? trialInfo.displayName : 'Trial';
+        }
+
         // Initialize
         async function initialize() {
             try {
@@ -424,7 +433,7 @@
                         </div>
                         <p class="text-gray-600">${state.loadingProgress}% complete</p>
                         <p class="text-sm text-gray-500 mt-4">Please wait while we load the voice samples...</p>
-                        <p class="text-sm font-medium text-indigo-600 mt-2">Trial: ${state.selectedTrial.replace(/_/g, " ")}</p>
+                        <p class="text-sm font-medium text-indigo-600 mt-2">${getTrialDisplayName()}</p>
                     </div>
                 </div>
             `;
@@ -438,7 +447,7 @@
                     <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-8">
                         <div class="mb-4 p-3 bg-indigo-100 rounded-lg">
                             <p class="text-sm font-medium text-indigo-800">
-                                Trial: ${state.selectedTrial.replace(/_/g, " ")} | Participant: ${state.participantId}
+                                ${getTrialDisplayName()} | Participant: ${state.participantId}
                             </p>
                         </div>
 
@@ -518,7 +527,7 @@
                             <div class="flex justify-between items-center mb-4">
                                 <div>
                                     <h1 class="text-2xl font-bold text-gray-800">Voice Arrangement Task</h1>
-                                    <p class="text-gray-600">Participant: ${state.participantId} | Trial: ${state.selectedTrial.replace(/_/g, " ")}</p>
+                                    <p class="text-gray-600">Participant: ${state.participantId} | ${getTrialDisplayName()}</p>
                                 </div>
                                 <div class="flex gap-2">
                                     <button onclick="resetPositions()" class="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
@@ -566,7 +575,7 @@
                             </div>
                             <h1 class="text-3xl font-bold text-gray-800 mb-2">Test Complete!</h1>
                             <p class="text-gray-600">Thank you for completing the test, ${state.participantId}</p>
-                            <p class="text-sm text-gray-500 mt-2">Trial: ${state.selectedTrial.replace(/_/g, " ")}</p>
+                            <p class="text-sm text-gray-500 mt-2">${getTrialDisplayName()}</p>
                         </div>
 
                         <div class="space-y-4">
@@ -622,13 +631,6 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                     </svg>
                                     3. Open Submission Form (Pre-filled)
-                                </button>
-                                
-                                <button
-                                    onclick="alert('Form URL:\\n' + getPrefilledFormURL() + '\\n\\nCheck browser console for details!')"
-                                    class="w-full mt-2 text-sm text-gray-600 hover:text-gray-800 transition-colors py-2"
-                                >
-                                    🔍 Debug: Show Generated URL
                                 </button>
                             </div>
 
