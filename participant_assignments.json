@@ -2,7 +2,7 @@
   "participants": {
     "P001": {
       "name": "Participant 001",
-      "email": "participant001@example.com",
+      "email": "jkreiman@ucla.edu",
       "assignedTrials": [
         "Male_read_MG1_MG2",
         "Male_read_MG1_MG3",
@@ -14,7 +14,7 @@
     },
     "P002": {
       "name": "Participant 002",
-      "email": "participant002@example.com",
+      "email": "alwan@ee.ucla.edu",
       "assignedTrials": [
         "Female_read_MG1_MG2",
         "Female_read_MG1_MG3",
