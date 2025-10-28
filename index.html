@@ -37,16 +37,19 @@
             // Build URL with proper encoding
             let url = GOOGLE_FORM_TEMPLATE;
             
+            // Get the trial display name (e.g., "Trial 1" instead of "Male_read_MG1_MG2")
+            const trialDisplayName = getTrialDisplayName();
+            
             // Replace each placeholder with actual values
             // NOTE: Using LANGUAGES_SPOKEN to match the Google Form template
             const replacements = {
                 'PARTICIPANT_ID': state.participantId,
-                'TRIAL_NAME': state.selectedTrial,
+                'TRIAL_NAME': trialDisplayName,  // Send "Trial 1" instead of full trial ID
                 'LISTENING_DEVICE': state.demographics.listeningDevice,
                 'MUSIC_BACKGROUND': state.demographics.musicBackground,
                 'LANGUAGE_BACKGROUND': state.demographics.languageBackground,
                 'FIRST_LANGUAGE': state.demographics.firstLanguage || 'N/A',
-                'LANGUAGES_SPOKEN': state.demographics.otherLanguages,  // Fixed: was OTHER_LANGUAGES
+                'LANGUAGES_SPOKEN': state.demographics.otherLanguages,
                 'AGE': state.demographics.age
             };
             
@@ -241,7 +244,7 @@
                                 </svg>
                                 <div class="text-sm text-gray-700">
                                     <p class="font-semibold mb-2">Welcome!</p>
-                                    <p class="mb-2">In this test, you will listen to voice samples and arrange them in a 2D space based on how similar they sound to you.</p>
+                                    <p class="mb-2">In this test, you will listen to voice samples and arrange them in the space provided based on how similar they sound to you.</p>
                                     <p>The test will take approximately 15-20 minutes to complete.</p>
                                 </div>
                             </div>
@@ -479,7 +482,7 @@
 
                             <div class="p-4 bg-indigo-50 rounded-lg">
                                 <h2 class="font-semibold text-lg mb-2">Your Task:</h2>
-                                <p>You will arrange ${numSamples} voice samples (numbered 1-${numSamples}) in a 2D space based on how similar they sound to you.</p>
+                                <p>You will arrange ${numSamples} voice samples (numbered 1-${numSamples}) in a space provided based on how similar they sound to you.</p>
                             </div>
 
                             <div class="p-4 bg-gray-50 rounded-lg">
@@ -596,7 +599,6 @@
                                 <ol class="text-sm text-gray-700 space-y-2 mb-4 list-decimal list-inside">
                                     <li><strong>Download both files</strong> using the buttons below</li>
                                     <li><strong>Open the pre-filled submission form</strong> (your demographic info is already filled in!)</li>
-                                    <li><strong>Enter your email</strong> in the form (use: <code class="bg-gray-100 px-1 rounded">${state.participantEmail}</code>)</li>
                                     <li><strong>Check the "Verified email" checkbox</strong> to receive a copy of your responses</li>
                                     <li><strong>Upload both files</strong> to the form and submit</li>
                                 </ol>
@@ -637,8 +639,7 @@
                             <div class="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
                                 <p class="text-sm text-gray-700">
                                     <strong>Important:</strong> Your demographic information is pre-filled in the form. 
-                                    You'll need to enter your email (<strong>${state.participantEmail}</strong>) and 
-                                    check the "Verified email" box to receive a copy of your submission!
+                                    Please check the "Verified email" box to receive a copy of your submission!
                                 </p>
                             </div>
 
