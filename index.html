@@ -21,7 +21,7 @@
         // Get this from: Google Form → ⋮ menu → Get pre-filled link
         // The form should have "Collect email addresses" enabled in Settings
         // Participants will manually check "Verified email" checkbox to receive responses
-	const GOOGLE_FORM_TEMPLATE = "https://docs.google.com/forms/d/e/1FAIpQLSd_MLDI7vuQN1c70_o5-szCioVbmrUKUKpHhtInxQ0tCnGREQ/viewform?usp=pp_url&entry.16675421=PARTICIPANT_ID&entry.623538109=TRIAL_NAME&entry.1036755193=LISTENING_DEVICE&entry.1172676033=MUSIC_BACKGROUND&entry.1771353994=LANGUAGE_BACKGROUND&entry.1783695746=FIRST_LANGUAGE&entry.1207484341=LANGUAGES_SPOKEN&entry.1419101100=AGE";
+        const GOOGLE_FORM_TEMPLATE = "https://docs.google.com/forms/d/e/1FAIpQLSd_MLDI7vuQN1c70_o5-szCioVbmrUKUKpHhtInxQ0tCnGREQ/viewform?usp=pp_url&entry.16675421=PARTICIPANT_ID&entry.623538109=TRIAL_NAME&entry.1036755193=LISTENING_DEVICE&entry.1172676033=MUSIC_BACKGROUND&entry.1771353994=LANGUAGE_BACKGROUND&entry.1783695746=FIRST_LANGUAGE&entry.1207484341=LANGUAGES_SPOKEN&entry.1419101100=AGE";
         
         // GitHub repository details
         const CONFIG = {
@@ -34,16 +34,41 @@
         // ========================================================
 
         function getPrefilledFormURL() {
-            return GOOGLE_FORM_TEMPLATE
-                .replace('PARTICIPANT_ID', encodeURIComponent(state.participantId))
-                .replace('PARTICIPANT_EMAIL', encodeURIComponent(state.participantEmail))
-                .replace('TRIAL_NAME', encodeURIComponent(state.selectedTrial))
-                .replace('LISTENING_DEVICE', encodeURIComponent(state.demographics.listeningDevice))
-                .replace('MUSIC_BACKGROUND', encodeURIComponent(state.demographics.musicBackground))
-                .replace('LANGUAGE_BACKGROUND', encodeURIComponent(state.demographics.languageBackground))
-                .replace('FIRST_LANGUAGE', encodeURIComponent(state.demographics.firstLanguage || 'N/A'))
-                .replace('OTHER_LANGUAGES', encodeURIComponent(state.demographics.otherLanguages))
-                .replace('AGE', encodeURIComponent(state.demographics.age));
+            // Build URL with proper encoding
+            let url = GOOGLE_FORM_TEMPLATE;
+            
+            // Replace each placeholder with actual values
+            // NOTE: Using LANGUAGES_SPOKEN to match the Google Form template
+            const replacements = {
+                'PARTICIPANT_ID': state.participantId,
+                'TRIAL_NAME': state.selectedTrial,
+                'LISTENING_DEVICE': state.demographics.listeningDevice,
+                'MUSIC_BACKGROUND': state.demographics.musicBackground,
+                'LANGUAGE_BACKGROUND': state.demographics.languageBackground,
+                'FIRST_LANGUAGE': state.demographics.firstLanguage || 'N/A',
+                'LANGUAGES_SPOKEN': state.demographics.otherLanguages,  // Fixed: was OTHER_LANGUAGES
+                'AGE': state.demographics.age
+            };
+            
+            console.log('=== FORM URL DEBUG ===');
+            console.log('Template URL:', GOOGLE_FORM_TEMPLATE);
+            console.log('Values to replace:', replacements);
+            
+            // Replace each placeholder
+            for (const [placeholder, value] of Object.entries(replacements)) {
+                const beforeReplace = url;
+                url = url.replace(placeholder, encodeURIComponent(value));
+                if (beforeReplace === url) {
+                    console.warn(`⚠️ Placeholder "${placeholder}" was NOT found in URL!`);
+                } else {
+                    console.log(`✓ Replaced ${placeholder} with "${value}"`);
+                }
+            }
+            
+            console.log('Final URL:', url);
+            console.log('======================');
+            
+            return url;
         }
 
         // State management
@@ -561,7 +586,9 @@
                                 </p>
                                 <ol class="text-sm text-gray-700 space-y-2 mb-4 list-decimal list-inside">
                                     <li><strong>Download both files</strong> using the buttons below</li>
-                                    <li><strong>Open the pre-filled submission form</strong> (your info is already filled in!)</li>
+                                    <li><strong>Open the pre-filled submission form</strong> (your demographic info is already filled in!)</li>
+                                    <li><strong>Enter your email</strong> in the form (use: <code class="bg-gray-100 px-1 rounded">${state.participantEmail}</code>)</li>
+                                    <li><strong>Check the "Verified email" checkbox</strong> to receive a copy of your responses</li>
                                     <li><strong>Upload both files</strong> to the form and submit</li>
                                 </ol>
                                 
@@ -596,11 +623,20 @@
                                     </svg>
                                     3. Open Submission Form (Pre-filled)
                                 </button>
+                                
+                                <button
+                                    onclick="alert('Form URL:\\n' + getPrefilledFormURL() + '\\n\\nCheck browser console for details!')"
+                                    class="w-full mt-2 text-sm text-gray-600 hover:text-gray-800 transition-colors py-2"
+                                >
+                                    🔍 Debug: Show Generated URL
+                                </button>
                             </div>
 
                             <div class="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
                                 <p class="text-sm text-gray-700">
-                                    <strong>Note:</strong> Your information will be automatically filled in the form. You only need to upload the two files!
+                                    <strong>Important:</strong> Your demographic information is pre-filled in the form. 
+                                    You'll need to enter your email (<strong>${state.participantEmail}</strong>) and 
+                                    check the "Verified email" box to receive a copy of your submission!
                                 </p>
                             </div>
 
