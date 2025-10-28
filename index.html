@@ -18,10 +18,8 @@
         // ============= CONFIGURATION - UPDATE THESE =============
         
         // Google Form Pre-filled URL Template
-        // Get this from: Google Form → ⋮ menu → Get pre-filled link
-        // Use these EXACT placeholders: PARTICIPANT_ID, TRIAL_NAME, LISTENING_DEVICE,
-        // MUSIC_BACKGROUND, LANGUAGE_BACKGROUND, FIRST_LANGUAGE, OTHER_LANGUAGES, AGE
-        const GOOGLE_FORM_TEMPLATE = "https://docs.google.com/forms/d/e/1FAIpQLSd_MLDI7vuQN1c70_o5-szCioVbmrUKUKpHhtInxQ0tCnGREQ/viewform?usp=pp_url&entry.16675421=PARTICIPANT_ID&entry.623538109=TRIAL_NAME&entry.1036755193=LISTENING_DEVICE&entry.1172676033=MUSIC_BACKGROUND&entry.1771353994=LANGUAGE_BACKGROUND&entry.1783695746=FIRST_LANGUAGE&entry.1207484341=OTHER_LANGUAGES&entry.1419101100=AGE"
+        "const GOOGLE_FORM_TEMPLATE = "https://docs.google.com/forms/d/e/1FAIpQLSd_MLDI7vuQN1c70_o5-szCioVbmrUKUKpHhtInxQ0tCnGREQ/viewform?usp=pp_url&entry.16675421=PARTICIPANT_ID&entry.623538109=TRIAL_NAME&entry.1036755193=LISTENING_DEVICE&entry.1172676033=MUSIC_BACKGROUND&entry.1771353994=LANGUAGE_BACKGROUND&entry.1783695746=FIRST_LANGUAGE&entry.1207484341=LANGUAGES_SPOKEN&entry.1419101100=AGE";
+
         
         // GitHub repository details
         const CONFIG = {
@@ -49,6 +47,7 @@
         let state = {
             stage: 'start',
             participantId: '',
+            participantEmail: '',
             selectedTrial: '',
             availableTrials: [],
             participantAssignments: null,
@@ -93,7 +92,7 @@
             render();
         }
 
-        function loadTrialsForParticipant(participantId) {
+        function loadTrialsForParticipant(participantId, email) {
             if (!state.participantAssignments) {
                 return [];
             }
@@ -104,12 +103,15 @@
                 return [];
             }
 
-            // Map assigned trial IDs to trial objects with display info
+            if (participant.email.toLowerCase() !== email.toLowerCase()) {
+                return [];
+            }
+
             return participant.assignedTrials.map(trialId => {
                 const trialInfo = state.participantAssignments.trialInfo[trialId];
                 return {
                     id: trialId,
-                    name: trialInfo ? trialInfo.name : trialId.replace(/_/g, " "),
+                    name: trialInfo && trialInfo.displayName ? trialInfo.displayName : trialId.replace(/_/g, " "),
                     numFiles: trialInfo ? trialInfo.numFiles : 24
                 };
             });
@@ -117,16 +119,15 @@
 
         function checkParticipantId() {
             const participantInput = document.getElementById('participantId');
+            const emailInput = document.getElementById('participantEmail');
             const trialSelectDiv = document.getElementById('trialSelectDiv');
             const trialSelect = document.getElementById('trialSelect');
             const participantError = document.getElementById('participantError');
             
             const participantId = participantInput.value.trim().toUpperCase();
+            const email = emailInput.value.trim();
             
-            console.log('Checking participant ID:', participantId);
-            console.log('Participant assignments loaded:', state.participantAssignments ? 'Yes' : 'No');
-            
-            if (!participantId) {
+            if (!participantId || !email) {
                 trialSelectDiv.style.display = 'none';
                 participantError.style.display = 'none';
                 return;
@@ -143,15 +144,13 @@
                 return;
             }
 
-            const assignedTrials = loadTrialsForParticipant(participantId);
-            
-            console.log('Assigned trials for', participantId, ':', assignedTrials);
+            const assignedTrials = loadTrialsForParticipant(participantId, email);
             
             if (assignedTrials.length === 0) {
                 participantError.style.display = 'block';
                 participantError.innerHTML = `
                     <div class="p-3 bg-red-50 border border-red-300 rounded-lg text-sm text-red-800">
-                        <strong>Invalid Participant ID:</strong> "${participantId}" is not registered. Please check your ID or contact the researcher.
+                        <strong>Authentication Failed:</strong> Participant ID "${participantId}" and email "${email}" do not match our records. Please check both entries or contact the researcher.
                     </div>
                 `;
                 trialSelectDiv.style.display = 'none';
@@ -160,14 +159,12 @@
                 participantError.style.display = 'none';
                 trialSelectDiv.style.display = 'block';
                 state.availableTrials = assignedTrials;
+                state.participantEmail = email;
                 
-                // Update dropdown
                 const trialsOptions = assignedTrials.map(trial => 
                     `<option value="${trial.id}">${trial.name} (${trial.numFiles} samples)</option>`
                 ).join('');
                 trialSelect.innerHTML = '<option value="">-- Select a trial --</option>' + trialsOptions;
-                
-                console.log('Updated trial dropdown with', assignedTrials.length, 'trials');
             }
         }
 
@@ -207,7 +204,7 @@
                                 </svg>
                                 <div class="text-sm text-gray-700">
                                     <p class="font-semibold mb-2">Welcome!</p>
-                                    <p class="mb-2">In this test, you will listen to voice samples and you will arrange them samples in the bounded space provided based on how similar they sound to you.</p>
+                                    <p class="mb-2">In this test, you will listen to voice samples and arrange them in a 2D space based on how similar they sound to you.</p>
                                     <p>The test will take approximately 15-20 minutes to complete.</p>
                                 </div>
                             </div>
@@ -222,14 +219,26 @@
                                 placeholder="Enter your participant ID (e.g., P001)" 
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                             />
-                            <button 
-                                onclick="checkParticipantId()" 
-                                class="mt-2 px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors"
-                            >
-                                Check ID
-                            </button>
-                            <p class="text-xs text-gray-500 mt-1">Enter your ID and click "Check ID"</p>
                         </div>
+
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                            <input 
+                                type="email" 
+                                id="participantEmail" 
+                                value="${state.participantEmail}" 
+                                placeholder="Enter your email address" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            />
+                            <p class="text-xs text-gray-500 mt-1">Use the same email provided by the researcher</p>
+                        </div>
+
+                        <button 
+                            onclick="checkParticipantId()" 
+                            class="mb-6 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+                        >
+                            Verify & Load Trials
+                        </button>
 
                         <div id="participantError" style="display: none;" class="mb-6"></div>
 
@@ -306,6 +315,7 @@
 
         function validateAndStart() {
             state.participantId = document.getElementById('participantId').value.trim().toUpperCase();
+            state.participantEmail = document.getElementById('participantEmail').value.trim();
             state.selectedTrial = document.getElementById('trialSelect').value;
             state.demographics.listeningDevice = document.getElementById('listeningDevice').value;
             state.demographics.musicBackground = document.getElementById('musicBackground').value;
@@ -319,9 +329,19 @@
                 return;
             }
             
-            // Validate participant ID exists
+            if (!state.participantEmail) {
+                alert('Please enter your email address');
+                return;
+            }
+            
             if (!state.participantAssignments || !state.participantAssignments.participants[state.participantId]) {
-                alert('Invalid Participant ID. Please check your ID or contact the researcher.');
+                alert('Invalid Participant ID. Please verify your ID and email.');
+                return;
+            }
+            
+            const participant = state.participantAssignments.participants[state.participantId];
+            if (participant.email.toLowerCase() !== state.participantEmail.toLowerCase()) {
+                alert('Email address does not match the Participant ID. Please check both entries.');
                 return;
             }
             
@@ -330,8 +350,6 @@
                 return;
             }
             
-            // Validate trial is assigned to this participant
-            const participant = state.participantAssignments.participants[state.participantId];
             if (!participant.assignedTrials.includes(state.selectedTrial)) {
                 alert('This trial is not assigned to you. Please select from your assigned trials.');
                 return;
@@ -404,7 +422,8 @@
                                 <ul class="list-disc list-inside space-y-1 text-sm">
                                     <li><strong>Take this test in a quiet room</strong> with minimal background noise</li>
                                     <li>Ensure your ${state.demographics.listeningDevice} are properly connected and working</li>
-                                    <li>Adjust your volume to a comfortable level before starting</li>
+                                    <li><strong>Set your volume to a comfortable level at the start</strong> and keep it constant throughout the test</li>
+                                    <li><strong>Listen to all voices at the same volume</strong> - do not adjust volume between samples</li>
                                 </ul>
                             </div>
 
@@ -423,15 +442,16 @@
 
                             <div class="p-4 bg-indigo-50 rounded-lg">
                                 <h2 class="font-semibold text-lg mb-2">Your Task:</h2>
-                                <p>You will arrange ${numSamples} voice samples (numbered 1-${numSamples}) in the bounded space provided based on how similar they sound to you.</p>
+                                <p>You will arrange ${numSamples} voice samples (numbered 1-${numSamples}) in a 2D space based on how similar they sound to you.</p>
                             </div>
 
                             <div class="p-4 bg-gray-50 rounded-lg">
                                 <h3 class="font-semibold mb-2">How to arrange voices:</h3>
                                 <ul class="list-disc list-inside space-y-2">
-                                    <li><strong>Similar-sounding voices</strong> → Place them close together</li>
+                                    <li><strong>Similar-sounding voices</strong> → Place them close together (can even overlap)</li>
                                     <li><strong>Different-sounding voices</strong> → Place them far apart</li>
-                                    <li>Use the entire bounded space to maximize differentiation</li>
+                                    <li><strong>Use the entire space</strong> - spread voices across the full canvas area</li>
+                                    <li>If voices sound very similar, you can place them on top of each other</li>
                                 </ul>
                             </div>
 
@@ -770,20 +790,6 @@
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            ctx.strokeStyle = '#e5e7eb';
-            ctx.lineWidth = 1;
-            for (let i = 0; i <= 10; i++) {
-                const pos = (i / 10) * canvas.width;
-                ctx.beginPath();
-                ctx.moveTo(pos, 0);
-                ctx.lineTo(pos, canvas.height);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(0, pos);
-                ctx.lineTo(canvas.width, pos);
-                ctx.stroke();
-            }
-            
             ctx.strokeStyle = '#9ca3af';
             ctx.lineWidth = 2;
             ctx.strokeRect(0, 0, canvas.width, canvas.height);
@@ -851,6 +857,7 @@
         function exportResults() {
             const results = {
                 participantId: state.participantId,
+                participantEmail: state.participantEmail,
                 trialId: state.selectedTrial,
                 timestamp: new Date().toISOString(),
                 demographics: state.demographics,
@@ -874,8 +881,8 @@
         function exportCSV() {
             const distances = calculateDistances();
             const csv = [
-                'Participant ID,Trial ID,Voice 1,Voice 2,Distance',
-                ...distances.map(d => `${state.participantId},${state.selectedTrial},${d.voice1},${d.voice2},${d.distance}`)
+                'Participant ID,Participant Email,Trial ID,Voice 1,Voice 2,Distance',
+                ...distances.map(d => `${state.participantId},${state.participantEmail},${state.selectedTrial},${d.voice1},${d.voice2},${d.distance}`)
             ].join('\n');
             
             const blob = new Blob([csv], { type: 'text/csv' });
