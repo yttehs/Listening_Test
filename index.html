@@ -18,7 +18,10 @@
         // ============= CONFIGURATION - UPDATE THESE =============
         
         // Google Form Pre-filled URL Template
-	const GOOGLE_FORM_TEMPLATE = "https://docs.google.com/forms/d/e/1FAIpQLSd_MLDI7vuQN1c70_o5-szCioVbmrUKUKpHhtInxQ0tCnGREQ/viewform?usp=pp_url&entry.16675421=PARTICIPANT_ID&entry.623538109=TRAIL_NAME&entry.1036755193=LISTENING_DEVICE&entry.1172676033=MUSIC_BACKGROUND&entry.1771353994=LANGUAGE_BACKGROUND&entry.1783695746=FIRST_LANGUAGE&entry.1207484341=LANGUAGES_SPOKEN&entry.1419101100=AGE";
+        // Get this from: Google Form → ⋮ menu → Get pre-filled link
+        // The form should have "Collect email addresses" enabled in Settings
+        // Participants will manually check "Verified email" checkbox to receive responses
+	const GOOGLE_FORM_TEMPLATE = "https://docs.google.com/forms/d/e/1FAIpQLSd_MLDI7vuQN1c70_o5-szCioVbmrUKUKpHhtInxQ0tCnGREQ/viewform?usp=pp_url&entry.16675421=PARTICIPANT_ID&entry.623538109=TRIAL_NAME&entry.1036755193=LISTENING_DEVICE&entry.1172676033=MUSIC_BACKGROUND&entry.1771353994=LANGUAGE_BACKGROUND&entry.1783695746=FIRST_LANGUAGE&entry.1207484341=LANGUAGES_SPOKEN&entry.1419101100=AGE";
         
         // GitHub repository details
         const CONFIG = {
@@ -33,7 +36,7 @@
         function getPrefilledFormURL() {
             return GOOGLE_FORM_TEMPLATE
                 .replace('PARTICIPANT_ID', encodeURIComponent(state.participantId))
-		.replace('PARTICIPANT_EMAIL', encodeURIComponent(state.participantEmail))
+                .replace('PARTICIPANT_EMAIL', encodeURIComponent(state.participantEmail))
                 .replace('TRIAL_NAME', encodeURIComponent(state.selectedTrial))
                 .replace('LISTENING_DEVICE', encodeURIComponent(state.demographics.listeningDevice))
                 .replace('MUSIC_BACKGROUND', encodeURIComponent(state.demographics.musicBackground))
