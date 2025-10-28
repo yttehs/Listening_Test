@@ -33,7 +33,6 @@
         function getPrefilledFormURL() {
             return GOOGLE_FORM_TEMPLATE
                 .replace('PARTICIPANT_ID', encodeURIComponent(state.participantId))
-                .replace('PARTICIPANT_EMAIL', encodeURIComponent(state.participantEmail))
                 .replace('TRIAL_NAME', encodeURIComponent(state.selectedTrial))
                 .replace('LISTENING_DEVICE', encodeURIComponent(state.demographics.listeningDevice))
                 .replace('MUSIC_BACKGROUND', encodeURIComponent(state.demographics.musicBackground))
