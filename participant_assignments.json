@@ -2,6 +2,7 @@
   "participants": {
     "P001": {
       "name": "Participant 001",
+      "email": "participant001@example.com",
       "assignedTrials": [
         "Male_read_MG1_MG2",
         "Male_read_MG1_MG3",
@@ -13,6 +14,7 @@
     },
     "P002": {
       "name": "Participant 002",
+      "email": "participant002@example.com",
       "assignedTrials": [
         "Female_read_MG1_MG2",
         "Female_read_MG1_MG3",
@@ -24,6 +26,7 @@
     },
     "P003": {
       "name": "Participant 003",
+      "email": "participant003@example.com",
       "assignedTrials": [
         "Male_conv_MG1_MG2",
         "Male_conv_MG1_MG3",
@@ -35,6 +38,7 @@
     },
     "P004": {
       "name": "Participant 004",
+      "email": "participant004@example.com",
       "assignedTrials": [
         "Female_conv_MG1_MG2",
         "Female_conv_MG1_MG3",
@@ -48,98 +52,122 @@
   "trialInfo": {
     "Male_read_MG1_MG2": {
       "name": "Male Read MG1 MG2",
+      "displayName": "Trial 1",
       "numFiles": 24
     },
     "Male_read_MG1_MG3": {
       "name": "Male Read MG1 MG3",
+      "displayName": "Trial 2",
       "numFiles": 25
     },
     "Male_read_MG1_MG4": {
       "name": "Male Read MG1 MG4",
+      "displayName": "Trial 3",
       "numFiles": 26
     },
     "Male_read_MG2_MG3": {
       "name": "Male Read MG2 MG3",
+      "displayName": "Trial 4",
       "numFiles": 25
     },
     "Male_read_MG2_MG4": {
       "name": "Male Read MG2 MG4",
+      "displayName": "Trial 5",
       "numFiles": 26
     },
     "Male_read_MG3_MG4": {
       "name": "Male Read MG3 MG4",
+      "displayName": "Trial 6",
       "numFiles": 26
     },
     "Male_conv_MG1_MG2": {
       "name": "Male Conv MG1 MG2",
+      "displayName": "Trial 1",
       "numFiles": 24
     },
     "Male_conv_MG1_MG3": {
       "name": "Male Conv MG1 MG3",
+      "displayName": "Trial 2",
       "numFiles": 25
     },
     "Male_conv_MG1_MG4": {
       "name": "Male Conv MG1 MG4",
+      "displayName": "Trial 3",
       "numFiles": 26
     },
     "Male_conv_MG2_MG3": {
       "name": "Male Conv MG2 MG3",
+      "displayName": "Trial 4",
       "numFiles": 25
     },
     "Male_conv_MG2_MG4": {
       "name": "Male Conv MG2 MG4",
+      "displayName": "Trial 5",
       "numFiles": 26
     },
     "Male_conv_MG3_MG4": {
       "name": "Male Conv MG3 MG4",
+      "displayName": "Trial 6",
       "numFiles": 26
     },
     "Female_read_MG1_MG2": {
       "name": "Female Read MG1 MG2",
+      "displayName": "Trial 1",
       "numFiles": 24
     },
     "Female_read_MG1_MG3": {
       "name": "Female Read MG1 MG3",
+      "displayName": "Trial 2",
       "numFiles": 25
     },
     "Female_read_MG1_MG4": {
       "name": "Female Read MG1 MG4",
+      "displayName": "Trial 3",
       "numFiles": 26
     },
     "Female_read_MG2_MG3": {
       "name": "Female Read MG2 MG3",
+      "displayName": "Trial 4",
       "numFiles": 25
     },
     "Female_read_MG2_MG4": {
       "name": "Female Read MG2 MG4",
+      "displayName": "Trial 5",
       "numFiles": 26
     },
     "Female_read_MG3_MG4": {
       "name": "Female Read MG3 MG4",
+      "displayName": "Trial 6",
       "numFiles": 26
     },
     "Female_conv_MG1_MG2": {
       "name": "Female Conv MG1 MG2",
+      "displayName": "Trial 1",
       "numFiles": 24
     },
     "Female_conv_MG1_MG3": {
       "name": "Female Conv MG1 MG3",
+      "displayName": "Trial 2",
       "numFiles": 25
     },
     "Female_conv_MG1_MG4": {
       "name": "Female Conv MG1 MG4",
+      "displayName": "Trial 3",
       "numFiles": 26
     },
     "Female_conv_MG2_MG3": {
       "name": "Female Conv MG2 MG3",
+      "displayName": "Trial 4",
       "numFiles": 24
     },
     "Female_conv_MG2_MG4": {
       "name": "Female Conv MG2 MG4",
+      "displayName": "Trial 5",
       "numFiles": 24
     },
     "Female_conv_MG3_MG4": {
       "name": "Female Conv MG3 MG4",
+      "displayName": "Trial 6",
       "numFiles": 24
     }
   }

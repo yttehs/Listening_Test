@@ -1,4 +1,66 @@
-<!DOCTYPE html>
+function validateAndStart() {
+            state.participantId = document.getElementById('participantId').value.trim().toUpperCase();
+            state.participantEmail = document.getElementById('participantEmail').value.trim();
+            state.selectedTrial = document.getElementById('trialSelect').value;
+            state.demographics.listeningDevice = document.getElementById('listeningDevice').value;
+            state.demographics.musicBackground = document.getElementById('musicBackground').value;
+            state.demographics.languageBackground = document.getElementById('languageBackground').value;
+            state.demographics.firstLanguage = document.getElementById('firstLanguage').value.trim();
+            state.demographics.otherLanguages = document.getElementById('otherLanguages').value.trim();
+            state.demographics.age = document.getElementById('age').value;
+
+            if (!state.participantId) {
+                alert('Please enter a participant ID');
+                return;
+            }
+            
+            if (!state.participantEmail) {
+                alert('Please enter your email address');
+                return;
+            }
+            
+            // Validate participant ID and email match
+            if (!state.participantAssignments || !state.participantAssignments.participants[state.participantId]) {
+                alert('Invalid Participant ID. Please verify your ID and email.');
+                return;
+            }
+            
+            const participant = state.participantAssignments.participants[state.participantId];
+            if (participant.email.toLowerCase() !== state.participantEmail.toLowerCase()) {
+                alert('Email address does not match the Participant ID. Please check both entries.');
+                return;
+            }
+            
+            if (!state.selectedTrial) {
+                alert('Please select a trial');
+                return;
+            }
+            
+            // Validate trial is assigned to this participant
+            if (!participant.assignedTrials.includes(state.selectedTrial)) {
+                alert('This trial is not assigned to you. Please select from your assigned trials.');
+                return;
+            }
+            
+            if (!state.demographics.listeningDevice) {
+                alert('Please select your listening device');
+                return;
+            }
+            if (!state.demographics.musicBackground) {
+                alert('Please indicate if you have a music background');
+                return;
+            }
+            if (!state.demographics.languageBackground) {
+                alert('Please select your language background');
+                return;
+            }
+            if (state.demographics.languageBackground === 'non-native' && !state.demographics.firstLanguage) {
+                alert('Please enter your first language');
+                return;
+            }
+            if (!state.demographics.otherLanguages) {
+                alert('Please list the languages you speak');
+                <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -21,8 +83,8 @@
         // Get this from: Google Form → ⋮ menu → Get pre-filled link
         // Use these EXACT placeholders: PARTICIPANT_ID, TRIAL_NAME, LISTENING_DEVICE,
         // MUSIC_BACKGROUND, LANGUAGE_BACKGROUND, FIRST_LANGUAGE, OTHER_LANGUAGES, AGE
-        const GOOGLE_FORM_TEMPLATE = "https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform?usp=pp_url&entry.111=PARTICIPANT_ID&entry.222=TRIAL_NAME&entry.333=LISTENING_DEVICE&entry.444=MUSIC_BACKGROUND&entry.555=LANGUAGE_BACKGROUND&entry.666=FIRST_LANGUAGE&entry.777=OTHER_LANGUAGES&entry.888=AGE";
-        
+	const GOOGLE_FORM_TEMPLATE = "https://docs.google.com/forms/d/e/1FAIpQLSd_MLDI7vuQN1c70_o5-szCioVbmrUKUKpHhtInxQ0tCnGREQ/viewform?usp=pp_url&entry.16675421=PARTICIPANT_ID&entry.1243735317=PARTICIPANT_EMAIL&entry.623538109=TRIAL_NAME&entry.1036755193=LISTENING_DEVICE&entry.1172676033=MUSIC_BACKGROUND&entry.1771353994=LANGUAGE_BACKGROUND&entry.1783695746=FIRST_LANGUAGE&entry.1207484341=OTHER_LANGUAGES&entry.1419101100=AGE";
+
         // GitHub repository details
         const CONFIG = {
             githubUser: 'yttehs',
@@ -49,6 +111,7 @@
         let state = {
             stage: 'start',
             participantId: '',
+            participantEmail: '',
             selectedTrial: '',
             availableTrials: [],
             participantAssignments: null,
@@ -93,7 +156,7 @@
             render();
         }
 
-        function loadTrialsForParticipant(participantId) {
+        function loadTrialsForParticipant(participantId, email) {
             if (!state.participantAssignments) {
                 return [];
             }
@@ -104,12 +167,17 @@
                 return [];
             }
 
+            // Verify email matches (case-insensitive)
+            if (participant.email.toLowerCase() !== email.toLowerCase()) {
+                return [];
+            }
+
             // Map assigned trial IDs to trial objects with display info
             return participant.assignedTrials.map(trialId => {
                 const trialInfo = state.participantAssignments.trialInfo[trialId];
                 return {
                     id: trialId,
-                    name: trialInfo ? trialInfo.name : trialId.replace(/_/g, " "),
+                    name: trialInfo && trialInfo.displayName ? trialInfo.displayName : trialId.replace(/_/g, " "),
                     numFiles: trialInfo ? trialInfo.numFiles : 24
                 };
             });
@@ -117,16 +185,18 @@
 
         function checkParticipantId() {
             const participantInput = document.getElementById('participantId');
+            const emailInput = document.getElementById('participantEmail');
             const trialSelectDiv = document.getElementById('trialSelectDiv');
             const trialSelect = document.getElementById('trialSelect');
             const participantError = document.getElementById('participantError');
             
             const participantId = participantInput.value.trim().toUpperCase();
+            const email = emailInput.value.trim();
             
-            console.log('Checking participant ID:', participantId);
+            console.log('Checking participant ID:', participantId, 'with email:', email);
             console.log('Participant assignments loaded:', state.participantAssignments ? 'Yes' : 'No');
             
-            if (!participantId) {
+            if (!participantId || !email) {
                 trialSelectDiv.style.display = 'none';
                 participantError.style.display = 'none';
                 return;
@@ -143,7 +213,7 @@
                 return;
             }
 
-            const assignedTrials = loadTrialsForParticipant(participantId);
+            const assignedTrials = loadTrialsForParticipant(participantId, email);
             
             console.log('Assigned trials for', participantId, ':', assignedTrials);
             
@@ -151,7 +221,7 @@
                 participantError.style.display = 'block';
                 participantError.innerHTML = `
                     <div class="p-3 bg-red-50 border border-red-300 rounded-lg text-sm text-red-800">
-                        <strong>Invalid Participant ID:</strong> "${participantId}" is not registered. Please check your ID or contact the researcher.
+                        <strong>Authentication Failed:</strong> Participant ID "${participantId}" and email "${email}" do not match our records. Please check both entries or contact the researcher.
                     </div>
                 `;
                 trialSelectDiv.style.display = 'none';
@@ -160,6 +230,7 @@
                 participantError.style.display = 'none';
                 trialSelectDiv.style.display = 'block';
                 state.availableTrials = assignedTrials;
+                state.participantEmail = email; // Store validated email
                 
                 // Update dropdown
                 const trialsOptions = assignedTrials.map(trial => 
@@ -222,14 +293,26 @@
                                 placeholder="Enter your participant ID (e.g., P001)" 
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                             />
-                            <button 
-                                onclick="checkParticipantId()" 
-                                class="mt-2 px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors"
-                            >
-                                Check ID
-                            </button>
-                            <p class="text-xs text-gray-500 mt-1">Enter your ID and click "Check ID"</p>
                         </div>
+
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                            <input 
+                                type="email" 
+                                id="participantEmail" 
+                                value="${state.participantEmail}" 
+                                placeholder="Enter your email address" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            />
+                            <p class="text-xs text-gray-500 mt-1">Use the same email provided by the researcher</p>
+                        </div>
+
+                        <button 
+                            onclick="checkParticipantId()" 
+                            class="mb-6 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+                        >
+                            Verify & Load Trials
+                        </button>
 
                         <div id="participantError" style="display: none;" class="mb-6"></div>
 
@@ -841,6 +924,7 @@
         function exportResults() {
             const results = {
                 participantId: state.participantId,
+                participantEmail: state.participantEmail,
                 trialId: state.selectedTrial,
                 timestamp: new Date().toISOString(),
                 demographics: state.demographics,
