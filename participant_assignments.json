@@ -1,8 +1,16 @@
 {
   "participants": {
+    "P000": {
+      "name": "Participant 000",
+      "email": "shettyvishwas@ucla.edu",
+      "assignedTrials": [
+        "Male_read_MG1_MG2",
+        "Male_read_MG1_MG3",
+      ]
+    },
     "P001": {
       "name": "Participant 001",
-      "email": "jkreiman@ucla.edu",
+      "email": "aki0501@g.ucla.edu",
       "assignedTrials": [
         "Male_read_MG1_MG2",
         "Male_read_MG1_MG3",
@@ -14,7 +22,7 @@
     },
     "P002": {
       "name": "Participant 002",
-      "email": "alwan@ee.ucla.edu",
+      "email": "tnfreedman@g.ucla.edu",
       "assignedTrials": [
         "Female_read_MG1_MG2",
         "Female_read_MG1_MG3",
@@ -26,7 +34,7 @@
     },
     "P003": {
       "name": "Participant 003",
-      "email": "participant003@example.com",
+      "email": "awong0811@g.ucla.edu",
       "assignedTrials": [
         "Male_conv_MG1_MG2",
         "Male_conv_MG1_MG3",
@@ -38,7 +46,7 @@
     },
     "P004": {
       "name": "Participant 004",
-      "email": "participant004@example.com",
+      "email": "ajliu2016@gmail.com",
       "assignedTrials": [
         "Female_conv_MG1_MG2",
         "Female_conv_MG1_MG3",
