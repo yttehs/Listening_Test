@@ -67,6 +67,30 @@
         "Male_conv_MG2_MG4",
         "Male_conv_MG3_MG4"
       ]
+    },
+    "P006": {
+      "name": "Participant 006",
+      "email": "priscillam20@ucla.edu",
+      "assignedTrials": [
+        "Male_conv_MG1_MG2",
+        "Male_conv_MG1_MG3",
+        "Male_conv_MG1_MG4",
+        "Male_conv_MG2_MG3",
+        "Male_conv_MG2_MG4",
+        "Male_conv_MG3_MG4"
+      ]
+    },
+    "P007": {
+      "name": "Participant 007",
+      "email": "yito2021@ucla.edu",
+      "assignedTrials": [
+        "Female_conv_MG1_MG2",
+        "Female_conv_MG1_MG3",
+        "Female_conv_MG1_MG4",
+        "Female_conv_MG2_MG3",
+        "Female_conv_MG2_MG4",
+        "Female_conv_MG3_MG4"
+      ]
     }
  },
   "trialInfo": {
