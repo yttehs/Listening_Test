@@ -55,8 +55,7 @@
         "Female_conv_MG2_MG4",
         "Female_conv_MG3_MG4"
       ]
-    }
-  },
+    },
     "P005": {
       "name": "Participant 005",
       "email": "joycez@ucla.edu",
@@ -68,7 +67,8 @@
         "Male_conv_MG2_MG4",
         "Male_conv_MG3_MG4"
       ]
-    },
+    }
+ },
   "trialInfo": {
     "Male_read_MG1_MG2": {
       "name": "Male Read MG1 MG2",
