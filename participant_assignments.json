@@ -94,7 +94,7 @@
     },
     "P008": {
       "name": "TOBIAS QUITUGUA",
-      "email": "tobiasquitugua@gmail.com",
+      "email": "TOBIASQUITUGUA@GMAIL.COM",
       "assignedTrials": [
         "Male_conv_MG1_MG2",
         "Male_conv_MG1_MG3",
@@ -107,6 +107,66 @@
     "P009": {
       "name": "VIVIANA THAI DUONG",
       "email": "vduong05@ucla.edu",
+      "assignedTrials": [
+        "Female_conv_MG1_MG2",
+        "Female_conv_MG1_MG3",
+        "Female_conv_MG1_MG4",
+        "Female_conv_MG2_MG3",
+        "Female_conv_MG2_MG4",
+        "Female_conv_MG3_MG4"
+      ]
+    },
+    "P010": {
+      "name": "LILY BRINKMAN",
+      "email": "lilybrinkman@ucla.edu",
+      "assignedTrials": [
+        "Male_conv_MG1_MG2",
+        "Male_conv_MG1_MG3",
+        "Male_conv_MG1_MG4",
+        "Male_conv_MG2_MG3",
+        "Male_conv_MG2_MG4",
+        "Male_conv_MG3_MG4"
+      ]
+    },
+    "P011": {
+      "name": "TRINITY ASSATA SCHOLER",
+      "email": "TRINITYSCHOLER@GMAIL.COM",
+      "assignedTrials": [
+        "Female_conv_MG1_MG2",
+        "Female_conv_MG1_MG3",
+        "Female_conv_MG1_MG4",
+        "Female_conv_MG2_MG3",
+        "Female_conv_MG2_MG4",
+        "Female_conv_MG3_MG4"
+      ]
+    },
+    "P012": {
+      "name": "LAINEY BELLE KEEFAUVER",
+      "email": "lbkeefauver@ucla.edu",
+      "assignedTrials": [
+        "Male_conv_MG1_MG2",
+        "Male_conv_MG1_MG3",
+        "Male_conv_MG1_MG4",
+        "Male_conv_MG2_MG3",
+        "Male_conv_MG2_MG4",
+        "Male_conv_MG3_MG4"
+      ]
+    },
+    "P013": {
+      "name": "ANIRUDH IYER",
+      "email": "aiyer917@g.ucla.edu",
+      "assignedTrials": [
+        "Female_conv_MG1_MG2",
+        "Female_conv_MG1_MG3",
+        "Female_conv_MG1_MG4",
+        "Female_conv_MG2_MG3",
+        "Female_conv_MG2_MG4",
+        "Female_conv_MG3_MG4"
+      ]
+    },
+    "P014": {
+      "name": "KARL DEXTER COLINA",
+      "email": "dexterkc@ucla.edu",
       "assignedTrials": [
         "Female_conv_MG1_MG2",
         "Female_conv_MG1_MG3",
