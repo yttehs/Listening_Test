@@ -175,6 +175,18 @@
         "Female_conv_MG2_MG4",
         "Female_conv_MG3_MG4"
       ]
+    },
+    "P015": {
+      "name": "CHLOE GISELE RODRIGUEZ",
+      "email": "CHLOEGISELE22@GMAIL.COM",
+      "assignedTrials": [
+        "Female_conv_MG1_MG2",
+        "Female_conv_MG1_MG3",
+        "Female_conv_MG1_MG4",
+        "Female_conv_MG2_MG3",
+        "Female_conv_MG2_MG4",
+        "Female_conv_MG3_MG4"
+      ]
     }
  },
   "trialInfo": {
