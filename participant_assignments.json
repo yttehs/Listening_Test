@@ -180,12 +180,12 @@
       "name": "CHLOE GISELE RODRIGUEZ",
       "email": "CHLOEGISELE22@GMAIL.COM",
       "assignedTrials": [
-        "Female_conv_MG1_MG2",
-        "Female_conv_MG1_MG3",
-        "Female_conv_MG1_MG4",
-        "Female_conv_MG2_MG3",
-        "Female_conv_MG2_MG4",
-        "Female_conv_MG3_MG4"
+        "Male_conv_MG1_MG2",
+        "Male_conv_MG1_MG3",
+        "Male_conv_MG1_MG4",
+        "Male_conv_MG2_MG3",
+        "Male_conv_MG2_MG4",
+        "Male_conv_MG3_MG4"
       ]
     }
  },
