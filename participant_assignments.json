@@ -187,6 +187,42 @@
         "Male_conv_MG2_MG4",
         "Male_conv_MG3_MG4"
       ]
+    },
+    "P016": {
+      "name": "OLIVER RUDKEVICH",
+      "email": "RUDKEVICHOLIVER@GMAIL.COM",
+      "assignedTrials": [
+        "Female_conv_MG1_MG2",
+        "Female_conv_MG1_MG3",
+        "Female_conv_MG1_MG4",
+        "Female_conv_MG2_MG3",
+        "Female_conv_MG2_MG4",
+        "Female_conv_MG3_MG4"
+      ]
+    },
+    "P017": {
+      "name": "TEDDY HOVSAPIAN",
+      "email": "teddyhov26@g.ucla.edu",
+      "assignedTrials": [
+        "Male_conv_MG1_MG2",
+        "Male_conv_MG1_MG3",
+        "Male_conv_MG1_MG4",
+        "Male_conv_MG2_MG3",
+        "Male_conv_MG2_MG4",
+        "Male_conv_MG3_MG4"
+      ]
+    },
+    "P018": {
+      "name": "VINCENT VELASCO",
+      "email": "VELASCO.V@PROTONMAIL.COM",
+      "assignedTrials": [
+        "Female_conv_MG1_MG2",
+        "Female_conv_MG1_MG3",
+        "Female_conv_MG1_MG4",
+        "Female_conv_MG2_MG3",
+        "Female_conv_MG2_MG4",
+        "Female_conv_MG3_MG4"
+      ]
     }
  },
   "trialInfo": {
