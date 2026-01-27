@@ -271,6 +271,42 @@
         "Female_conv_MG2_MG4",
         "Female_conv_MG3_MG4"
       ]
+    },
+    "P023": {
+      "name": "ALEXIS ARRAYAH OLIVER",
+      "email": "aoliver20007@gmail.com",
+      "assignedTrials": [
+        "Male_conv_MG1_MG2",
+        "Male_conv_MG1_MG3",
+        "Male_conv_MG1_MG4",
+        "Male_conv_MG2_MG3",
+        "Male_conv_MG2_MG4",
+        "Male_conv_MG3_MG4"
+      ]
+    },
+    "P024": {
+      "name": "JOSEPHINE YEHRANG CHUNG",
+      "email": "josephineyc@ucla.edu",
+      "assignedTrials": [
+        "Female_conv_MG1_MG2",
+        "Female_conv_MG1_MG3",
+        "Female_conv_MG1_MG4",
+        "Female_conv_MG2_MG3",
+        "Female_conv_MG2_MG4",
+        "Female_conv_MG3_MG4"
+      ]
+    },
+    "P025": {
+      "name": "BREANN KHIEV",
+      "email": "breannkhiev@ucla.edu",
+      "assignedTrials": [
+        "Male_conv_MG1_MG2",
+        "Male_conv_MG1_MG3",
+        "Male_conv_MG1_MG4",
+        "Male_conv_MG2_MG3",
+        "Male_conv_MG2_MG4",
+        "Male_conv_MG3_MG4"
+      ]
     }
  },
   "trialInfo": {
